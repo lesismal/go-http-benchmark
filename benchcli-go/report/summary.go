@@ -19,7 +19,7 @@ var SummaryParameters = []SummaryParameter{
 	{"Rate Concurrency", "Goroutines writing BenchPipeline's batches, over all connections (-rc)"},
 	{"Rate Duration", "How long BenchPipeline sends for (-rd)"},
 	{"Rate SendRate", "Requests sent to each connection per second in BenchPipeline (-rr)"},
-	{"Rate Pipeline", "Requests per pipelined write: most that fit -rbs bytes and divide -rr"},
+	{"Rate Pipeline", "Requests merged into one write per connection in BenchPipeline (-rpl)"},
 }
 
 // SummaryParameter is one row of the Summary table: the parameter's name and

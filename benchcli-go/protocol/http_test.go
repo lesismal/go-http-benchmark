@@ -74,6 +74,22 @@ func TestReadResponseRejects(t *testing.T) {
 	}
 }
 
+func TestPipelineBuffers(t *testing.T) {
+	buf := make([]byte, 1100)
+	batch, n, tick := PipelineBuffers(buf, 200, 25)
+	if n != 25 || tick != 8 || len(batch) != 25*len(buf) {
+		t.Errorf("PipelineBuffers = %d bytes, %d per batch, %d a second", len(batch), n, tick)
+	}
+	for _, c := range []struct {
+		pipeline, rate int
+		ok             bool
+	}{{0, 200, true}, {1, 200, true}, {25, 200, true}, {200, 200, true}, {-1, 200, false}, {3, 200, false}, {400, 200, false}} {
+		if err := ValidatePipeline(c.pipeline, c.rate); (err == nil) != c.ok {
+			t.Errorf("ValidatePipeline(%d, %d) = %v", c.pipeline, c.rate, err)
+		}
+	}
+}
+
 func TestBatchBuffers(t *testing.T) {
 	buf := make([]byte, 1100)
 	batch, n, tick := BatchBuffers(buf, 200, 16*1024)

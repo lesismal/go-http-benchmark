@@ -28,7 +28,7 @@ another on the same keep-alive connections:
 | --- | --- | --- |
 | `Connections` | dials `-c` TCP connections, `-dc` at a time, and sends one `GET /echo` on each | connections established and answered per second |
 | `BenchEcho` | `-en` request/response round trips: a `POST /echo` with `-b` random bytes, then the response is read back, with one request in flight per connection and `-ec` connections busy at once | round trips per second |
-| `BenchPipeline` | HTTP/1.1 pipelining for `-rd` seconds: each connection gets `-rr` requests a second, written in batches of up to `-rbs` bytes without waiting for earlier responses; a goroutine per connection reads the responses | responses read back per second |
+| `BenchPipeline` | HTTP/1.1 pipelining for `-rd` seconds: each connection gets `-rr` requests a second, written in batches of `-rpl` requests (or, with `-rpl=0`, as many as fit in `-rbs` bytes) without waiting for earlier responses; a goroutine per connection reads the responses | responses read back per second |
 
 `Connections` sends a request on each connection because an HTTP server has no
 handshake of its own, and a connection the kernel accepted is not yet one the
@@ -38,8 +38,16 @@ server is serving. That GET is the equivalent of the WebSocket upgrade.
 falls behind the rate, the client skips that connection for a tick instead of
 queueing more requests, so a slow server is measured by what it answered, not
 by how deep a backlog the client built. When the duration is up, the client
-waits up to one more tick for the last batch, then counts. `Pipeline` in the
-Summary table is the number of requests per batch.
+waits up to one more tick for the last batch, then counts. `Rate Pipeline` in
+the Summary table is the number of requests merged into one write. Set it with
+`-rpl`, which has to divide `-rr` so that the batch goes out a whole number of
+times a second. The default, `-rpl=0`, uses the most requests that fit in
+`-rbs` bytes (16KB) and divide `-rr`, which is 10 for the default 1KB payload
+and 200 requests a second:
+
+```sh
+bash script/benchmark.sh -rr=200 -rpl=50   # 50 requests per write, 4 writes a second
+```
 
 The client writes pre-encoded requests and parses responses with a small
 reader ([`protocol`](benchcli-go/protocol/http.go)) instead of `net/http`'s

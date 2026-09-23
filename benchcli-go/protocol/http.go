@@ -53,6 +53,27 @@ func BatchBuffers(buf []byte, rate, maxLen int) ([]byte, int, int) {
 	return bytes.Repeat(buf, batch), batch, rate / batch
 }
 
+// PipelineBuffers is buf repeated pipeline times, with how many times a second
+// that batch has to be written to send rate copies of buf a second. pipeline
+// has to divide rate; see ValidatePipeline.
+func PipelineBuffers(buf []byte, rate, pipeline int) ([]byte, int, int) {
+	return bytes.Repeat(buf, pipeline), pipeline, rate / pipeline
+}
+
+// ValidatePipeline checks a requested pipeline depth against the send rate:
+// 0 asks for the depth BatchBuffers works out, and anything else has to divide
+// rate, since the batch is written a whole number of times a second.
+func ValidatePipeline(pipeline, rate int) error {
+	switch {
+	case pipeline < 0:
+		return fmt.Errorf("pipeline %d: want 0, which fits as many requests as -rbs holds, or more", pipeline)
+	case pipeline > 0 && rate%pipeline != 0:
+		return fmt.Errorf("pipeline %d does not divide the send rate %d, so no whole number of"+
+			" writes a second sends it; pick a divisor of %d", pipeline, rate, rate)
+	}
+	return nil
+}
+
 var (
 	ErrMalformedStatus = errors.New("http: malformed status line")
 	ErrMalformedHeader = errors.New("http: malformed header line")

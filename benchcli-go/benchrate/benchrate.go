@@ -33,9 +33,12 @@ type BenchRate struct {
 	Concurrency int
 	SendRate    int
 	BatchSize   int
-	Payload     int
-	SendLimit   int
-	PsInterval  time.Duration
+	// Pipeline is how many requests go into one write, or 0 for as many as
+	// fit in BatchSize bytes and divide SendRate.
+	Pipeline   int
+	Payload    int
+	SendLimit  int
+	PsInterval time.Duration
 
 	ServerPid int
 	PsCounter *perf.PSCounter
@@ -252,7 +255,14 @@ func (br *BenchRate) init() {
 	br.wbuffer = make([]byte, br.Payload)
 	rand.Read(br.wbuffer)
 	request := protocol.EncodeRequest("POST", connections.Host(br.Ip), config.EchoPath, br.wbuffer)
-	br.batchBuffer, br.batch, br.tickRate = protocol.BatchBuffers(request, br.SendRate, br.BatchSize)
+	if err := protocol.ValidatePipeline(br.Pipeline, br.SendRate); err != nil {
+		logging.Fatalf("%v: %v", report.BenchPipelineName, err)
+	}
+	if br.Pipeline > 0 {
+		br.batchBuffer, br.batch, br.tickRate = protocol.PipelineBuffers(request, br.SendRate, br.Pipeline)
+	} else {
+		br.batchBuffer, br.batch, br.tickRate = protocol.BatchBuffers(request, br.SendRate, br.BatchSize)
+	}
 	if br.tickRate <= 0 || len(br.batchBuffer) == 0 {
 		logging.Fatalf("%v got a wrong tickRate: %v, or batchBuffer: %v", report.BenchPipelineName, br.tickRate, len(br.batchBuffer))
 	}

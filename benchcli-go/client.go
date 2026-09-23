@@ -12,6 +12,7 @@ import (
 	"go-http-benchmark/benchcli-go/benchecho"
 	"go-http-benchmark/benchcli-go/benchrate"
 	"go-http-benchmark/benchcli-go/connections"
+	"go-http-benchmark/benchcli-go/protocol"
 	"go-http-benchmark/benchcli-go/report"
 	"go-http-benchmark/config"
 	"go-http-benchmark/logging"
@@ -55,7 +56,8 @@ var (
 	rateConcurrency   = flag.Int("rc", 10000, "benchrate: concurrency: how many goroutines used to write the pipelined requests")
 	rateDuration      = flag.Int("rd", 10, `benchrate: how long to spend to do the test`)
 	rateSendRate      = flag.Int("rr", 200, "benchrate: how many requests can be sent to 1 conn every second")
-	rateBatchSize     = flag.Int("rbs", 1024*16, "benchrate: how many bytes of pipelined requests can be written to 1 conn every time")
+	rateBatchSize     = flag.Int("rbs", 1024*16, "benchrate: how many bytes of pipelined requests can be written to 1 conn every time, when -rpl is 0")
+	ratePipeline      = flag.Int("rpl", 0, "benchrate: pipeline: how many requests are merged into one write to 1 conn, which must divide -rr; 0 takes as many as fit in -rbs bytes")
 	rateSendLimit     = flag.Int("rl", 0, `benchrate: request sending limitation per second`)
 	ratePprof         = flag.Bool("rp", false, `benchrate: generate pprof report`)
 	ratePprofDuration = flag.Int("rpd", 5, `benchrate: pprof duration`)
@@ -88,6 +90,13 @@ func main() {
 	if *genReport {
 		generateReports()
 		return
+	}
+
+	// Checked before the connections are dialed, for the same reason as -sort.
+	if *rateEnabled {
+		if err := protocol.ValidatePipeline(*ratePipeline, max(*rateSendRate, 1)); err != nil {
+			logging.Fatalf("-rpl=%v: %v", *ratePipeline, err)
+		}
 	}
 
 	if _, err := config.GetFrameworkBenchmarkPorts(*framework); err != nil {
@@ -183,6 +192,7 @@ func main() {
 		br.Duration = time.Second * time.Duration(*rateDuration)
 		br.SendRate = *rateSendRate
 		br.BatchSize = *rateBatchSize
+		br.Pipeline = *ratePipeline
 		br.Payload = *payload
 		br.SendLimit = *rateSendLimit
 		if *ratePprof {
