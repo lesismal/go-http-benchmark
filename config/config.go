@@ -28,6 +28,7 @@ type InitArgs struct {
 // script/1m_conns_benchmark.sh, so that a framework sits in the same place in
 // all of them and a new one has one obvious place to go in each.
 const (
+	Axum     = "axum"
 	Fasthttp = "fasthttp"
 	Fib      = "fib"
 	Gin      = "gin"
@@ -37,7 +38,12 @@ const (
 // Ports is the range of benchmark ports each framework's server listens on.
 // Fifty of them, so that a client dialing a million connections from one
 // address does not run out of ephemeral ports towards any one of them.
+//
+// axum is a Rust server and cannot import this map, so it carries its range
+// as FIRST_PORT and LAST_PORT in frameworks/axum/src/main.rs, which
+// TestAxumPortsMatch holds to the one here.
 var Ports = map[string]string{
+	Axum:     "14001:14050",
 	Fasthttp: "10001:10050",
 	Fib:      "11001:11050",
 	Gin:      "12001:12050",
@@ -48,6 +54,7 @@ var Ports = map[string]string{
 // row order of a -sort=framework report, which is what puts a framework on the
 // same row in every table and across runs, whatever it scored.
 var FrameworkList = []string{
+	Axum,
 	Fasthttp,
 	Fib,
 	Gin,

@@ -81,11 +81,14 @@ SleepTime=5
 # that a framework is in the same place in every list and a new one has one
 # obvious place to go.
 #
+#   axum      https://crates.io/crates/axum, a Rust server on tokio; building
+#             it needs cargo (see frameworks/axum/build.sh)
 #   fasthttp  github.com/valyala/fasthttp
 #   fib       github.com/lesismal/fib/go, its HTTP/1 server (fib/go/http)
 #   gin       github.com/gin-gonic/gin, served by net/http
 #   nethttp   the standard library's net/http
 frameworks=(
+    "axum"
     "fasthttp"
     "fib"
     "gin"

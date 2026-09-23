@@ -27,10 +27,14 @@ Environment overrides:
   DOCKER_BENCH_OUTPUT      Result directory (default: output/docker/<timestamp>)
   DOCKER_BENCH_SKIP_BUILD  Set to 1 to reuse an existing image
   DOCKER_BENCH_GO_IMAGE    Base image (default: golang:1.27-bookworm)
+  DOCKER_BENCH_RUST_IMAGE  Image the Rust toolchain is copied from
+                           (default: rust:1.98-bookworm)
   DOCKER_BENCH_APT_MIRROR  Replaces http://deb.debian.org in the image's apt
                            sources, e.g. https://mirrors.aliyun.com
   DOCKER_BENCH_GOPROXY     GOPROXY for the image's go mod download
-  (script/docker_benchmark_cn.sh sets the last three to mainland China mirrors.)
+  DOCKER_BENCH_CARGO_MIRROR Sparse registry replacing crates.io for the image's
+                           cargo build, e.g. sparse+https://rsproxy.cn/index/
+  (script/docker_benchmark_cn.sh sets the last five to mainland China mirrors.)
 
 Examples:
   bash script/docker_benchmark.sh --smoke
@@ -84,6 +88,8 @@ fi
 if [ -n "${DOCKER_BENCH_GO_IMAGE:-}" ]; then build_args+=(--build-arg "GO_IMAGE=$DOCKER_BENCH_GO_IMAGE"); fi
 if [ -n "${DOCKER_BENCH_APT_MIRROR:-}" ]; then build_args+=(--build-arg "APT_MIRROR=$DOCKER_BENCH_APT_MIRROR"); fi
 if [ -n "${DOCKER_BENCH_GOPROXY:-}" ]; then build_args+=(--build-arg "GO_PROXY=$DOCKER_BENCH_GOPROXY"); fi
+if [ -n "${DOCKER_BENCH_RUST_IMAGE:-}" ]; then build_args+=(--build-arg "RUST_IMAGE=$DOCKER_BENCH_RUST_IMAGE"); fi
+if [ -n "${DOCKER_BENCH_CARGO_MIRROR:-}" ]; then build_args+=(--build-arg "CARGO_MIRROR=$DOCKER_BENCH_CARGO_MIRROR"); fi
 if [ "${DOCKER_BENCH_SKIP_BUILD:-0}" != 1 ]; then
     echo "Building Docker benchmark image: $image"
     docker build "${build_args[@]}" .

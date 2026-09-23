@@ -13,7 +13,10 @@ build_benchmark() {
     if bench_runs_servers; then
         for f in "${frameworks[@]}"; do
             echo "build ${f} ..."
-            go build -o "./output/bin/${f}.server" "./frameworks/${f}" || return 1
+            case "${f}" in
+                axum) bash ./frameworks/axum/build.sh "$(pwd)/output/bin/${f}.server" || return 1 ;;
+                *) go build -o "./output/bin/${f}.server" "./frameworks/${f}" || return 1 ;;
+            esac
             echo "build ${f} done"
             echo
         done

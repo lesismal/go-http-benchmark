@@ -20,6 +20,7 @@ echo $line
 # way it narrows the full list.
 if [ -z "${BENCH_FRAMEWORKS:-}" ]; then
     frameworks=(
+        "axum"
         "fasthttp"
         "fib"
         "gin"

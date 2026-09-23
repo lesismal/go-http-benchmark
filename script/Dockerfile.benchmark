@@ -1,4 +1,10 @@
 ARG GO_IMAGE=golang:1.27-bookworm
+# The Rust toolchain for the axum server, copied out of the official image
+# rather than installed with rustup, so that the build downloads nothing from
+# rustup's servers. It links with the gcc the Go image already carries.
+ARG RUST_IMAGE=rust:1.98-bookworm
+FROM ${RUST_IMAGE} AS rust
+
 FROM ${GO_IMAGE}
 
 # Where the build downloads from; empty means the upstream default. Set by
@@ -8,8 +14,17 @@ FROM ${GO_IMAGE}
 # the benchmark itself runs with --network none.
 #   APT_MIRROR     replaces http://deb.debian.org, e.g. https://mirrors.aliyun.com
 #   GO_PROXY       GOPROXY for go mod download, e.g. https://goproxy.cn
+#   CARGO_MIRROR   a sparse registry replacing crates.io for cargo, e.g.
+#                  sparse+https://rsproxy.cn/index/
 ARG APT_MIRROR=
 ARG GO_PROXY=
+ARG CARGO_MIRROR=
+
+COPY --from=rust /usr/local/rustup /usr/local/rustup
+COPY --from=rust /usr/local/cargo /usr/local/cargo
+ENV RUSTUP_HOME=/usr/local/rustup \
+    CARGO_HOME=/usr/local/cargo \
+    PATH=/usr/local/cargo/bin:$PATH
 
 # procps, psmisc and util-linux for pkill/killall and taskset, which the
 # scripts stop the servers and pin them to their CPUs with.
@@ -34,8 +49,26 @@ COPY go.mod go.sum ./
 RUN if [ -n "$GO_PROXY" ]; then export GOPROXY="$GO_PROXY"; fi \
     && go mod download
 
+# The axum server's dependencies, fetched and compiled into the image the way
+# go mod download fetches the Go ones, so that script/build.sh builds it in
+# the container with no network. Copied on its own ahead of the rest of the
+# tree, so an edit elsewhere does not compile them again, and compiled to a
+# target directory outside the workspace, which COPY . . leaves alone.
+#
+# A mirror is written to CARGO_HOME's config rather than passed for this one
+# build: cargo caches what it downloads under the source it came from, so the
+# offline build in the container has to name the same source to find it.
+ENV CARGO_TARGET_DIR=/tmp/cargo-target
+COPY frameworks/axum /workspace/frameworks/axum
+RUN if [ -n "$CARGO_MIRROR" ]; then \
+        printf '[source.crates-io]\nreplace-with = "mirror"\n\n[source.mirror]\nregistry = "%s"\n' "$CARGO_MIRROR" \
+            >> "$CARGO_HOME/config.toml"; \
+    fi \
+    && cargo build --release --locked --manifest-path frameworks/axum/Cargo.toml
+
 COPY . .
 
-ENV GOCACHE=/tmp/go-build-cache
+ENV GOCACHE=/tmp/go-build-cache \
+    CARGO_NET_OFFLINE=true
 
 CMD ["bash", "script/benchmark.sh"]

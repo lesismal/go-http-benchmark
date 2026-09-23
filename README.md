@@ -1,11 +1,13 @@
 # go-http-benchmark
 
-HTTP/1.1 server benchmark for Go frameworks, built the same way as
+HTTP/1.1 server benchmark for Go frameworks, with Rust's axum as a
+reference, built the same way as
 [go-websocket-benchmark](https://github.com/lesismal/go-websocket-benchmark):
 the same scripts, the same Go client structure, and the same report format.
 
 | Framework | Package | Server |
 | --- | --- | --- |
+| `axum` | [axum](https://crates.io/crates/axum) (Rust) | `axum::serve` on tokio's multi-threaded runtime, one listener per port, one worker thread per CPU the process may run on |
 | `fasthttp` | [github.com/valyala/fasthttp](https://github.com/valyala/fasthttp) | one `fasthttp.Server` serving every port |
 | `fib` | [github.com/lesismal/fib/go](https://github.com/lesismal/fib) | one fib engine bound to every port, HTTP/1 handler from `fib/go/http` |
 | `gin` | [github.com/gin-gonic/gin](https://github.com/gin-gonic/gin) | `gin.New()` (no logger or recovery middleware) on `net/http` |
@@ -18,6 +20,15 @@ ephemeral ports toward any one port. `/init`, `/ps` and `/debug/pprof/` are on
 a separate `net/http` server on the port after the last benchmark port. That
 way the framework being measured serves nothing but `/echo`, and control
 requests never wait behind benchmark requests.
+
+`axum` is a Rust program in [`frameworks/axum`](frameworks/axum), so it cannot
+share the Go servers' control server. It serves `/init` and `/ps` itself, on
+its own control port, in the same JSON shape (only the `cpu` and `mem[].rss`
+fields, which are all the clients read). It has no `/debug/pprof/`, so the
+client's pprof fetch fails for axum and logs it. It takes the same `-nodelay`,
+`-reuseport` and `-b` flags; `-m` is accepted and ignored, since Rust has no
+GC to limit. Its port range is a constant in `src/main.rs`, which a test in
+`config` holds to `config.Ports`.
 
 ## What is measured
 
@@ -64,7 +75,10 @@ CPU, MEM and EER columns read 0. The client logs a message when that happens.
 
 ## Run
 
-Go 1.27 or later. From the repository root:
+Go 1.27 or later, and for `axum` a Rust toolchain (cargo 1.85 or later; see
+[rustup.rs](https://rustup.rs)). Without cargo, leave axum out with
+`BENCH_FRAMEWORKS`, e.g. `BENCH_FRAMEWORKS=fasthttp,fib,gin,nethttp`. From the
+repository root:
 
 ```sh
 # all frameworks, 10k connections, 1k payload
@@ -115,8 +129,10 @@ bash script/docker_benchmark.sh -c=10000 -en=2000000 -b=1024
 Run `bash script/docker_benchmark.sh --help` for all overrides. From mainland
 China, use `script/docker_benchmark_cn.sh` instead. It takes the same options
 and builds the image from mirrors (DaoCloud for Docker Hub, Aliyun for apt,
-goproxy.cn for Go modules). Only the build downloads anything, and the
-benchmark itself runs with `--network none`.
+goproxy.cn for Go modules, rsproxy.cn for crates.io). Only the build downloads
+anything, and the benchmark itself runs with `--network none`: the image
+carries the Rust toolchain and has axum's dependencies compiled, so building
+axum in the container needs no network.
 
 The [Docker benchmark workflow](.github/workflows/docker-benchmark.yml) runs
 the same script on every push to `main`, or by hand from the Actions tab, and
