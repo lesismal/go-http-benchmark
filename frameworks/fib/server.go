@@ -23,6 +23,13 @@ func main() {
 	// HTTP/1 only, as the other three serve it here: none of them speaks
 	// cleartext HTTP/2, and the clients never ask for it.
 	httpConfig.DisableHTTP2 = true
+	// Recycle each request's objects once its response is finished, as
+	// fasthttp recycles its RequestCtx. onRequest keeps nothing of a request
+	// past its response, which is what these ask of a handler.
+	httpConfig.ReuseRequests = true
+	httpConfig.ReuseHeaders = true
+	httpConfig.ReuseURLs = true
+	httpConfig.ReuseContexts = true
 	handler := &serverHandler{
 		ServerHandler: fibhttp.NewHandlerWithConfig(httpConfig, fibhttp.HandlerFunc(onRequest)),
 		nodelay:       *frameworks.Nodelay,
