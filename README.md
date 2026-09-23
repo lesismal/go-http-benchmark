@@ -117,7 +117,8 @@ writes the tables to the job summary.
 ## Report format
 
 The reports have the same layout as go-websocket-benchmark's: a Summary table
-of the run's parameters, then one table per benchmark.
+of the run's parameters, each with a description of what it means and the
+flag that sets it, then one table per benchmark.
 
 - Rows are ranked best first by `TPS`. In `BenchEcho` and `BenchPipeline`, a tie
   is broken by `EER`. The ranked columns carry `[↓1]` and `[↓2]` in their

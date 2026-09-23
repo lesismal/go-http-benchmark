@@ -297,9 +297,9 @@ func TestSummaryTakesTheParametersOutOfTheTables(t *testing.T) {
 
 	// Left-aligned, in the console and in the markdown.
 	lines := strings.Split(summary, "\n")
-	if lines[0] != "| Parameter        | Value                         |" ||
-		lines[1] != "| ---              | ---                           |" ||
-		lines[2] != "| Client           | go                            |" {
+	if lines[0] != "| Parameter        | Value                         | Description                                                            |" ||
+		lines[1] != "| ---              | ---                           | ---                                                                    |" ||
+		lines[2] != "| Client           | go                            | The benchmark client the load came from                                |" {
 		t.Errorf("Summary is not left-aligned:\n%s", summary)
 	}
 
@@ -309,11 +309,14 @@ func TestSummaryTakesTheParametersOutOfTheTables(t *testing.T) {
 }
 
 // TestSummaryParametersListsEveryTag keeps SummaryParameters, which both
-// clients order the Summary table by, in step with the tags.
+// clients order and describe the Summary table by, in step with the tags.
 func TestSummaryParametersListsEveryTag(t *testing.T) {
 	listed := map[string]bool{}
-	for _, name := range SummaryParameters {
-		listed[name] = true
+	for _, p := range SummaryParameters {
+		listed[p.Name] = true
+		if p.Description == "" {
+			t.Errorf("SummaryParameters does not say what %v means", p.Name)
+		}
 	}
 	for _, r := range []interface{}{ConnectionsReport{}, BenchEchoReport{}, BenchRateReport{}} {
 		typ := reflect.TypeOf(r)

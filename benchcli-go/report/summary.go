@@ -6,19 +6,27 @@ import (
 )
 
 // SummaryParameters is the order the Summary table lists the run's parameters
-// in: the names the report fields are tagged summary:"<name>" with. A tagged
-// name missing from here still gets a row, after these.
-var SummaryParameters = []string{
-	"Client",
-	"Conns",
-	"Payload",
-	"Dial Concurrency",
-	"Echo Concurrency",
-	"Echo Total",
-	"Rate Concurrency",
-	"Rate Duration",
-	"Rate SendRate",
-	"Rate Pipeline",
+// in, and what each one means: the names the report fields are tagged
+// summary:"<name>" with. A tagged name missing from here still gets a row,
+// after these, with no description.
+var SummaryParameters = []SummaryParameter{
+	{"Client", "The benchmark client the load came from"},
+	{"Conns", "Keep-alive connections dialed (-c) and used by every benchmark"},
+	{"Payload", "Request body size in bytes (-b), which the server echoes back"},
+	{"Dial Concurrency", "Connections dialed at once in Connections (-dc)"},
+	{"Echo Concurrency", "Connections with a request in flight at once in BenchEcho (-ec)"},
+	{"Echo Total", "Request/response round trips BenchEcho makes in all (-en)"},
+	{"Rate Concurrency", "Goroutines writing BenchPipeline's batches, over all connections (-rc)"},
+	{"Rate Duration", "How long BenchPipeline sends for (-rd)"},
+	{"Rate SendRate", "Requests sent to each connection per second in BenchPipeline (-rr)"},
+	{"Rate Pipeline", "Requests per pipelined write: most that fit -rbs bytes and divide -rr"},
+}
+
+// SummaryParameter is one row of the Summary table: the parameter's name and
+// what it means.
+type SummaryParameter struct {
+	Name        string
+	Description string
 }
 
 // summaryValue is one value a parameter took, and the frameworks it took it
@@ -63,9 +71,20 @@ func Summary(tables ...[]Report) string {
 
 	var rows [][]string
 	for _, name := range summaryOrder(names) {
-		rows = append(rows, []string{name, summaryString(values[name])})
+		rows = append(rows, []string{name, summaryString(values[name]), summaryDescription(name)})
 	}
-	return markdownTableAligned([]string{"Parameter", "Value"}, rows, true)
+	return markdownTableAligned([]string{"Parameter", "Value", "Description"}, rows, true)
+}
+
+// summaryDescription is what SummaryParameters says a parameter means, or
+// nothing for one it does not list.
+func summaryDescription(name string) string {
+	for _, p := range SummaryParameters {
+		if p.Name == name {
+			return p.Description
+		}
+	}
+	return ""
 }
 
 func addSummaryValue(values []summaryValue, value, framework string) []summaryValue {
@@ -102,10 +121,10 @@ func summaryOrder(names []string) []string {
 		found[name] = true
 	}
 	ordered := make([]string, 0, len(names))
-	for _, name := range SummaryParameters {
-		if found[name] {
-			ordered = append(ordered, name)
-			delete(found, name)
+	for _, p := range SummaryParameters {
+		if found[p.Name] {
+			ordered = append(ordered, p.Name)
+			delete(found, p.Name)
 		}
 	}
 	for _, name := range names {
