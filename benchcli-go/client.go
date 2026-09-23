@@ -34,7 +34,7 @@ var (
 	dialRetries       = flag.Int("dr", 5, "client: dial retry times")
 	dialRetryInterval = flag.Duration("dri", 100*time.Millisecond, "client; dial retry interval")
 
-	// BenchEcho && BenchRate
+	// BenchEcho && BenchPipeline
 	payload    = flag.Int("b", 1024, `benchmark: request body size of benchecho and benchrate, which the server echoes back`)
 	checkValid = flag.Bool("check", false, `benchmark: whether to check the validity of the response data`)
 	psInterval = flag.Int("pi", 1000, `benchmark: ps interval of benchecho and benchrate, 1000 ms by default`)
@@ -50,7 +50,7 @@ var (
 	echoPprof         = flag.Bool("ep", true, `benchecho: generate pprof report`)
 	echoPprofDuration = flag.Int("epd", 5, `benchecho: pprof duration`)
 
-	// BenchRate
+	// BenchPipeline
 	rateEnabled       = flag.Bool("rate", false, `benchrate: whether run benchrate`)
 	rateConcurrency   = flag.Int("rc", 10000, "benchrate: concurrency: how many goroutines used to write the pipelined requests")
 	rateDuration      = flag.Int("rd", 10, `benchrate: how long to spend to do the test`)
@@ -190,13 +190,13 @@ func main() {
 				time.AfterFunc(time.Second*2, func() {
 					cpu, err := httpGet(cpuProfileUrlRate)
 					if err != nil {
-						fmt.Printf("BenchRate: [pprof cpu] httpGet failed: %v\n", err)
+						fmt.Printf("%v: [pprof cpu] httpGet failed: %v\n", report.BenchPipelineName, err)
 						return
 					}
 
 					mem, err := httpGet(memProfileUrl)
 					if err != nil {
-						fmt.Printf("BenchRate: [pprof mem] httpGet failed: %v\n", err)
+						fmt.Printf("%v: [pprof mem] httpGet failed: %v\n", report.BenchPipelineName, err)
 						return
 					}
 					br.SetPprofData(cpu, mem)
@@ -230,7 +230,7 @@ func generateReports() {
 		{"Summary", report.GenerateSummary(*preffix, *suffix)},
 		{"Connections", report.GenerateConnectionsReports(*preffix, *suffix, *enableTPN, *reportSort, nil)},
 		{"BenchEcho", report.GenerateBenchEchoReports(*preffix, *suffix, *enableTPN, *reportSort, nil)},
-		{"BenchRate", report.GenerateBenchRateReports(*preffix, *suffix, *enableTPN, *reportSort, nil)},
+		{report.BenchPipelineName, report.GenerateBenchRateReports(*preffix, *suffix, *enableTPN, *reportSort, nil)},
 	}
 	for _, section := range sections {
 		filename := report.Filename(section.name, *preffix, *suffix+".md")

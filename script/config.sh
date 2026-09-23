@@ -39,13 +39,14 @@ esac
 # rows and the same numbers; only the order differs:
 #
 #   result     (default) best first, ranked by the number each benchmark
-#              answers with: TPS in all three - for BenchRate the responses the
-#              clients read back off the server per second - with EER breaking
-#              a tie in BenchEcho and BenchRate (Connections samples no CPU, so
-#              it has none). The rate test pipelines requests at a rate the
-#              clients set rather than to completion, so what came back under
-#              that load is its result there the way TPS is in the other two;
-#              Req Sent is the load rather than the answer
+#              answers with: TPS in all three - for BenchPipeline the
+#              responses the clients read back off the server per second -
+#              with EER breaking a tie in BenchEcho and BenchPipeline
+#              (Connections samples no CPU, so it has none). The rate test
+#              pipelines requests at a rate the clients set rather than to
+#              completion, so what came back under that load is its result
+#              there the way TPS is in the other two; Req Sent is the load
+#              rather than the answer
 #   framework  the order FrameworkList in config/config.go lists them in,
 #              which is by framework name. It is what puts a framework on the
 #              same row in every table and across runs, whatever it scored, so

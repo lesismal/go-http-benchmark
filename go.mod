@@ -4,7 +4,7 @@ go 1.27
 
 require (
 	github.com/gin-gonic/gin v1.12.0
-	github.com/lesismal/fib/go v0.0.0-20260923142003-67db8f96ef5a
+	github.com/lesismal/fib/go v0.0.0-20260923144357-2d350b97fc33
 	github.com/lesismal/perf v0.0.0-20240508164715-fdb92a70ac1c
 	github.com/libp2p/go-reuseport v0.4.0
 	github.com/shirou/gopsutil v3.21.11+incompatible

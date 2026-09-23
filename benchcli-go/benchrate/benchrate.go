@@ -95,7 +95,7 @@ func (br *BenchRate) Run() {
 	for _, c := range br.Conns {
 		if c.Broken {
 			if err := c.Redial(); err != nil {
-				logging.Printf("BenchRate: redial %v failed, leaving the connection out: %v", c.Addr, err)
+				logging.Printf("%v: redial %v failed, leaving the connection out: %v", report.BenchPipelineName, c.Addr, err)
 				continue
 			}
 		}
@@ -107,7 +107,7 @@ func (br *BenchRate) Run() {
 		connTeams[i%len(connTeams)] = append(connTeams[i%len(connTeams)], c)
 	}
 
-	logging.Printf("BenchRate for %.2f seconds, %d requests pipelined per write ...", br.Duration.Seconds(), br.batch)
+	logging.Printf("%v for %.2f seconds, %d requests pipelined per write ...", report.BenchPipelineName, br.Duration.Seconds(), br.batch)
 
 	readers := sync.WaitGroup{}
 	for _, c := range conns {
@@ -169,7 +169,7 @@ snapshot:
 	readers.Wait()
 	br.recvTimes, br.recvBytes = recvTimes, recvBytes
 
-	logging.Printf("BenchRate for %.2f seconds done", br.Duration.Seconds())
+	logging.Printf("%v for %.2f seconds done", report.BenchPipelineName, br.Duration.Seconds())
 }
 
 func (br *BenchRate) Stop() {
@@ -204,8 +204,8 @@ func (br *BenchRate) Report() *report.BenchRateReport {
 	var psErr error
 	br.PsCounter, psErr = br.psInfo()
 	if psErr != nil {
-		logging.Printf("BenchRate: resource statistics for %v incomplete, EchoEER will read 0: %v",
-			br.Framework, psErr)
+		logging.Printf("%v: resource statistics for %v incomplete, EchoEER will read 0: %v",
+			report.BenchPipelineName, br.Framework, psErr)
 	}
 	if br.PsCounter != nil {
 		r.CPUMin = br.PsCounter.CPUMin()
@@ -240,7 +240,7 @@ func (br *BenchRate) init() {
 		br.Concurrency = len(br.Conns)
 	}
 	if br.Concurrency <= 0 {
-		logging.Fatalf("BenchRate: no connections to run on")
+		logging.Fatalf("%v: no connections to run on", report.BenchPipelineName)
 	}
 	if br.SendRate <= 0 {
 		br.SendRate = 1
@@ -254,7 +254,7 @@ func (br *BenchRate) init() {
 	request := protocol.EncodeRequest("POST", connections.Host(br.Ip), config.EchoPath, br.wbuffer)
 	br.batchBuffer, br.batch, br.tickRate = protocol.BatchBuffers(request, br.SendRate, br.BatchSize)
 	if br.tickRate <= 0 || len(br.batchBuffer) == 0 {
-		logging.Fatalf("BenchRate get wrong tickRate: %v, or batchBuffer: %v", br.tickRate, len(br.batchBuffer))
+		logging.Fatalf("%v got a wrong tickRate: %v, or batchBuffer: %v", report.BenchPipelineName, br.tickRate, len(br.batchBuffer))
 	}
 
 	if br.PsInterval <= 0 {

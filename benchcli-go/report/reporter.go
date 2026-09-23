@@ -26,7 +26,7 @@ type Report interface {
 // The orders a report table can be written in, as -sort takes them.
 const (
 	// SortResult puts the best result first: TPS for Connections, and TPS
-	// then EER for BenchEcho and BenchRate, whose TPS is the responses the
+	// then EER for BenchEcho and BenchPipeline, whose TPS is the responses the
 	// clients read back off the server per second. The fields tagged rank:"1", rank:"2" and so on are
 	// what it compares, in that order. Rows that tie on all of them keep the
 	// framework order between them, so a run is reproducible rather than

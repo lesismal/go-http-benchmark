@@ -28,13 +28,13 @@ another on the same keep-alive connections:
 | --- | --- | --- |
 | `Connections` | dials `-c` TCP connections, `-dc` at a time, and sends one `GET /echo` on each | connections established and answered per second |
 | `BenchEcho` | `-en` request/response round trips: a `POST /echo` with `-b` random bytes, then the response is read back, with one request in flight per connection and `-ec` connections busy at once | round trips per second |
-| `BenchRate` | HTTP/1.1 pipelining for `-rd` seconds: each connection gets `-rr` requests a second, written in batches of up to `-rbs` bytes without waiting for earlier responses; a goroutine per connection reads the responses | responses read back per second |
+| `BenchPipeline` | HTTP/1.1 pipelining for `-rd` seconds: each connection gets `-rr` requests a second, written in batches of up to `-rbs` bytes without waiting for earlier responses; a goroutine per connection reads the responses | responses read back per second |
 
 `Connections` sends a request on each connection because an HTTP server has no
 handshake of its own, and a connection the kernel accepted is not yet one the
 server is serving. That GET is the equivalent of the WebSocket upgrade.
 
-`BenchRate` limits each connection to four unanswered batches. When the server
+`BenchPipeline` limits each connection to four unanswered batches. When the server
 falls behind the rate, the client skips that connection for a tick instead of
 queueing more requests, so a slow server is measured by what it answered, not
 by how deep a backlog the client built. When the duration is up, the client
@@ -74,7 +74,7 @@ bash script/1m_conns_benchmark.sh
 
 Change the defaults in [`script/config.sh`](script/config.sh). Reports are
 written to `output/report`: one JSON file per framework and benchmark, plus
-`Summary.md`, `Connections.md`, `BenchEcho.md` and `BenchRate.md`. Server logs
+`Summary.md`, `Connections.md`, `BenchEcho.md` and `BenchPipeline.md`. Server logs
 are in `output/log`. `benchmark.sh` forwards only `-nodelay`, `-reuseport`,
 `-b` and `-m` to the servers. Every other flag goes to the client; run
 `go run ./benchcli-go -h` for the list.
@@ -119,7 +119,7 @@ writes the tables to the job summary.
 The reports have the same layout as go-websocket-benchmark's: a Summary table
 of the run's parameters, then one table per benchmark.
 
-- Rows are ranked best first by `TPS`. In `BenchEcho` and `BenchRate`, a tie
+- Rows are ranked best first by `TPS`. In `BenchEcho` and `BenchPipeline`, a tie
   is broken by `EER`. The ranked columns carry `[↓1]` and `[↓2]` in their
   titles.
 - Every ranked column shows each row's share of the best value in that

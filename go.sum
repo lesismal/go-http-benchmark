@@ -40,8 +40,8 @@ github.com/klauspost/cpuid/v2 v2.3.0 h1:S4CRMLnYUhGeDFDqkGriYKdfoFlDnMtqTiI/sFzh
 github.com/klauspost/cpuid/v2 v2.3.0/go.mod h1:hqwkgyIinND0mEev00jJYCxPNVRVXFQeu1XKlok6oO0=
 github.com/leodido/go-urn v1.4.0 h1:WT9HwE9SGECu3lg4d/dIA+jxlljEa1/ffXKmRjqdmIQ=
 github.com/leodido/go-urn v1.4.0/go.mod h1:bvxc+MVxLKB4z00jd1z+Dvzr47oO32F/QSNjSBOlFxI=
-github.com/lesismal/fib/go v0.0.0-20260923142003-67db8f96ef5a h1:zAdZfoEuwS1msLXFk48EfSZ62Vl9SiQ9/51L9aPJQlk=
-github.com/lesismal/fib/go v0.0.0-20260923142003-67db8f96ef5a/go.mod h1:b1pauZmHbnnYd+kmEFzbkky9Z36an7ttGIDsAd/kwnI=
+github.com/lesismal/fib/go v0.0.0-20260923144357-2d350b97fc33 h1:rscMxkSQW1j98BOb/ZqP+9u86cFWUxSoMZ4PhVZ6DIo=
+github.com/lesismal/fib/go v0.0.0-20260923144357-2d350b97fc33/go.mod h1:b1pauZmHbnnYd+kmEFzbkky9Z36an7ttGIDsAd/kwnI=
 github.com/lesismal/perf v0.0.0-20240508164715-fdb92a70ac1c h1:cB/Kbeew70XRJAgfRU0Ddf7yPy5jvaN7DeS0F+fP1HA=
 github.com/lesismal/perf v0.0.0-20240508164715-fdb92a70ac1c/go.mod h1:Re4gjh2ATiXLaIOGygcsWYlA2NnWPCCGppJ4GQCVpLw=
 github.com/libp2p/go-reuseport v0.4.0 h1:nR5KU7hD0WxXCJbmw7r2rhRYruNRl2koHw8fQscQm2s=

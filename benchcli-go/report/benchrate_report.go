@@ -41,12 +41,17 @@ type BenchRateReport struct {
 	pprofDataMEM []byte  `json:"-" md:"-" fmt:"-"`
 }
 
+// BenchPipelineName is what the pipelined rate benchmark is called wherever a
+// person reads it: its report table and the files it is written to, and the
+// client's log.
+const BenchPipelineName = "BenchPipeline"
+
 func (r *BenchRateReport) Type() string {
-	return "BenchRate"
+	return BenchPipelineName
 }
 
 func (r *BenchRateReport) Name() string {
-	return fmt.Sprintf("%s-BenchRate", r.Framework)
+	return fmt.Sprintf("%s-%s", r.Framework, BenchPipelineName)
 }
 
 func (r *BenchRateReport) Headers() []string {

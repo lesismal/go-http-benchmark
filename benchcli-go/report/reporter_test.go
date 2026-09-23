@@ -75,7 +75,7 @@ func TestSortResultRanksRateByTPSThenEER(t *testing.T) {
 	}
 	want := []string{"many-cheap", "many-costly", "mid", "few"}
 	if got := names(SortReports(rate, SortResult)); !equal(got, want) {
-		t.Errorf("BenchRate ranked %v, want %v", got, want)
+		t.Errorf("BenchPipeline ranked %v, want %v", got, want)
 	}
 }
 
@@ -171,7 +171,7 @@ func rowOrder(table string, want ...string) bool {
 // TestHiddenColumnsStayInTheJSON holds the tables and the console to the
 // shorter set of columns, and the JSON to all of them: TP50, TP75, TP90,
 // CPU Min and MEM Min are md:"-", the Client column drops the "benchcli-"
-// prefix, and BenchRate's EchoEER is headed EER.
+// prefix, and BenchPipeline's EchoEER is headed EER.
 func TestHiddenColumnsStayInTheJSON(t *testing.T) {
 	Init(true)
 	hidden := []string{"TP50", "TP75", "TP90", "CPU Min", "MEM Min", "benchcli-", "EchoEER"}
@@ -198,7 +198,7 @@ func TestHiddenColumnsStayInTheJSON(t *testing.T) {
 	}
 	if table := Markdown([]Report{rate}, true, SortFramework, nil); !strings.Contains(table, " EER [↓2] ") ||
 		!strings.Contains(table, "12.50") {
-		t.Errorf("BenchRate table:\n%s", table)
+		t.Errorf("BenchPipeline table:\n%s", table)
 	}
 	if summary := Summary([]Report{echo}, []Report{rate}); !strings.Contains(summary, "| Client           | go ") {
 		t.Errorf("Summary does not show the clients without their prefix:\n%s", summary)
@@ -210,7 +210,7 @@ func TestHiddenColumnsStayInTheJSON(t *testing.T) {
 		}
 	}
 	if !strings.Contains(JSON(rate), `"EchoEER":12.5`) {
-		t.Errorf("BenchRate JSON lost EchoEER: %s", JSON(rate))
+		t.Errorf("BenchPipeline JSON lost EchoEER: %s", JSON(rate))
 	}
 }
 
@@ -250,7 +250,7 @@ func TestMarkdownShowsThePercentOfTheBest(t *testing.T) {
 	}, false, SortResult, nil)
 	for _, cell := range []string{"| 200 100% |", "|  50  25% |"} {
 		if !strings.Contains(table, cell) {
-			t.Errorf("BenchRate: no %q in:\n%s", cell, table)
+			t.Errorf("BenchPipeline: no %q in:\n%s", cell, table)
 		}
 	}
 }
@@ -367,7 +367,7 @@ func TestMarkdownShowsThePercentOfTheBestEER(t *testing.T) {
 	}, false, SortFramework, nil)
 	for _, cell := range []string{"|  40.00  25% |", "| 160.00 100% |"} {
 		if !strings.Contains(rate, cell) {
-			t.Errorf("BenchRate: no %q in:\n%s", cell, rate)
+			t.Errorf("BenchPipeline: no %q in:\n%s", cell, rate)
 		}
 	}
 	if conns := Markdown([]Report{&ConnectionsReport{Framework: "a", TPS: 5}}, false, SortResult, nil); strings.Count(conns, "%") != 1 {
@@ -437,13 +437,13 @@ func TestRankMarkersKeepTheColumnsInLine(t *testing.T) {
 	}
 }
 
-// TestRateTPSIsPacketsPerSecond puts BenchRate's TPS right after Framework,
+// TestRateTPSIsPacketsPerSecond puts BenchPipeline's TPS right after Framework,
 // works it out for a report written before it had one, and leaves Packet Recv
 // a plain column.
 func TestRateTPSIsPacketsPerSecond(t *testing.T) {
 	Init(false)
 	if got := BenchRateReportMarkdownHeaders[:3]; !equal(got, []string{"Framework", "TPS", "EER"}) {
-		t.Errorf("BenchRate columns start %v, want Framework, TPS, EER", got)
+		t.Errorf("BenchPipeline columns start %v, want Framework, TPS, EER", got)
 	}
 	if got := RateTPS(39809390, 10e9); got != 3980939 {
 		t.Errorf("RateTPS = %v, want 3980939", got)
@@ -465,7 +465,7 @@ func TestRateTPSIsPacketsPerSecond(t *testing.T) {
 
 	table := Markdown([]Report{old}, false, SortResult, nil)
 	if !strings.Contains(table, "| 3980939 100% |") || !strings.Contains(table, " 39809399 ") {
-		t.Errorf("BenchRate table:\n%s", table)
+		t.Errorf("BenchPipeline table:\n%s", table)
 	}
 }
 
