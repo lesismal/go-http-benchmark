@@ -120,7 +120,11 @@ benchmark itself runs with `--network none`.
 
 The [Docker benchmark workflow](.github/workflows/docker-benchmark.yml) runs
 the same script on every push to `main`, or by hand from the Actions tab, and
-writes the tables to the job summary.
+writes the tables to the job summary. The container gets 8 CPUs when the
+runner has at least 8, and 4 otherwise, so every CI run is one of those two
+sizes. The standard GitHub-hosted runner has 4 CPUs; to get 8, set the
+repository variable `DOCKER_BENCH_RUNNER` to the label of a larger runner. A
+runner with fewer than 4 CPUs fails the job.
 
 ## Report format
 
