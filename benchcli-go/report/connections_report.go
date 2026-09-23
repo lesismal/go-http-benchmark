@@ -12,6 +12,7 @@ var (
 // samples no CPU.
 type ConnectionsReport struct {
 	Framework   string `json:"Framework" md:"Framework"`
+	Lang        string `json:"Lang" md:"Lang"`
 	BenchClient string `json:"BenchClient" md:"Client" fmt:"client" summary:"Client"`
 	TPS         int64  `json:"TPS" md:"TPS" rank:"1"`
 	Min         int64  `json:"Min" md:"Min" fmt:"duration" tpn:"opt"`

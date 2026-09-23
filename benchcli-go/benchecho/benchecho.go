@@ -121,6 +121,7 @@ func (be *BenchEcho) Report() *report.BenchEchoReport {
 	r := &report.BenchEchoReport{
 		BenchClient: "benchcli-go",
 		Framework:   be.Framework,
+		Lang:        config.FrameworkLang(be.Framework),
 		Connections: len(be.Conns),
 		Concurrency: be.Concurrency,
 		Payload:     be.Payload,

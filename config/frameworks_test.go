@@ -16,6 +16,22 @@ func TestFrameworkListSortedByName(t *testing.T) {
 	}
 }
 
+// Every framework's report row names its language, so every framework needs
+// one, and a language with no framework is a leftover.
+func TestFrameworkListCoversLangs(t *testing.T) {
+	if len(FrameworkList) != len(Langs) {
+		t.Errorf("FrameworkList has %d frameworks, Langs has %d", len(FrameworkList), len(Langs))
+	}
+	for _, framework := range FrameworkList {
+		if Langs[framework] == "" {
+			t.Errorf("%v has no language", framework)
+		}
+	}
+	if got := FrameworkLang("no-such-framework"); got != "-" {
+		t.Errorf("FrameworkLang of an unknown framework = %q, want -", got)
+	}
+}
+
 // A framework with no ports is one the clients cannot reach, and a port range
 // with no framework is one nothing runs on: the two lists have to carry the
 // same names.

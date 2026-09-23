@@ -192,6 +192,7 @@ func (br *BenchRate) Report() *report.BenchRateReport {
 	r := &report.BenchRateReport{
 		BenchClient: "benchcli-go",
 		Framework:   br.Framework,
+		Lang:        config.FrameworkLang(br.Framework),
 		Duration:    br.Duration.Nanoseconds(),
 		Connections: len(br.Conns),
 		Concurrency: br.Concurrency,

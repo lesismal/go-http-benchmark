@@ -148,6 +148,8 @@ The reports have the same layout as go-websocket-benchmark's: a Summary table
 of the run's parameters, each with a description of what it means and the
 flag that sets it, then one table per benchmark.
 
+- `Lang`, right after `Framework`, is the language the framework's server is
+  written in (`go`, `rust`), from `config.Langs`.
 - Rows are ranked best first by `TPS`. In `BenchEcho` and `BenchPipeline`, a tie
   is broken by `EER`. The ranked columns carry `[↓1]` and `[↓2]` in their
   titles.
@@ -235,23 +237,23 @@ They are not a reference measurement: re-run on your own hardware.
 | Rate SendRate    | 200     |
 | Rate Pipeline    | 10      |
 
-| Framework |  TPS [↓1]  |   Min    |   Avg   |   Max    |  TP95   |   TP99   |   Used   | Total | Success | Failed |
-|   ---     |    ---     |   ---    |   ---   |   ---    |   ---   |   ---    |   ---    |  ---  |   ---   |  ---   |
-| fasthttp  | 48778 100% | 194.79us | 30.01ms | 121.61ms | 88.05ms | 109.95ms | 205.01ms | 10000 |  10000  |   0    |
-|   fib     | 48027  98% |  1.02ms  | 31.85ms | 136.02ms | 77.17ms | 122.74ms | 208.21ms | 10000 |  10000  |   0    |
-|   gin     | 46409  95% | 35.04us  | 33.00ms | 138.23ms | 71.22ms | 93.95ms  | 215.47ms | 10000 |  10000  |   0    |
-| nethttp   | 42989  88% | 51.17us  | 33.67ms | 173.39ms | 87.98ms | 102.75ms | 232.61ms | 10000 |  10000  |   0    |
+| Framework | Lang |  TPS [↓1]  |   Min    |   Avg   |   Max    |  TP95   |   TP99   |   Used   | Total | Success | Failed |
+|   ---     | ---  |    ---     |   ---    |   ---   |   ---    |   ---   |   ---    |   ---    |  ---  |   ---   |  ---   |
+| fasthttp  |  go  | 48778 100% | 194.79us | 30.01ms | 121.61ms | 88.05ms | 109.95ms | 205.01ms | 10000 |  10000  |   0    |
+|   fib     |  go  | 48027  98% |  1.02ms  | 31.85ms | 136.02ms | 77.17ms | 122.74ms | 208.21ms | 10000 |  10000  |   0    |
+|   gin     |  go  | 46409  95% | 35.04us  | 33.00ms | 138.23ms | 71.22ms | 93.95ms  | 215.47ms | 10000 |  10000  |   0    |
+| nethttp   |  go  | 42989  88% | 51.17us  | 33.67ms | 173.39ms | 87.98ms | 102.75ms | 232.61ms | 10000 |  10000  |   0    |
 
-| Framework |  TPS [↓1]   |   EER [↓2]   |   Min   |   Avg   |   Max    |  TP95   |  TP99   | Used  | Success | Failed | CPU Avg | CPU Max | MEM Avg | MEM Max |
-|   ---     |     ---     |     ---      |   ---   |   ---   |   ---    |   ---   |   ---   |  ---  |   ---   |  ---   |   ---   |   ---   |   ---   |   ---   |
-| fasthttp  | 457150 100% | 1534.21 100% | 9.04us  | 21.78ms | 46.02ms  | 23.72ms | 30.96ms | 4.37s | 2000000 |   0    | 297.97  | 298.97  | 193.60M | 194.32M |
-|   fib     | 364725  79% | 1319.49  86% | 20.88us | 27.30ms | 363.22ms | 45.21ms | 54.31ms | 5.48s | 2000000 |   0    | 276.41  | 277.98  | 89.22M  | 94.27M  |
-| nethttp   | 298872  65% | 1039.90  67% | 7.50us  | 33.32ms | 71.90ms  | 43.67ms | 48.26ms | 6.69s | 2000000 |   0    | 287.40  | 295.97  | 315.14M | 315.88M |
-|   gin     | 294209  64% | 1005.20  65% | 7.92us  | 33.86ms | 66.20ms  | 43.68ms | 47.18ms | 6.80s | 2000000 |   0    | 292.69  | 296.97  | 318.62M | 318.99M |
+| Framework | Lang |  TPS [↓1]   |   EER [↓2]   |   Min   |   Avg   |   Max    |  TP95   |  TP99   | Used  | Success | Failed | CPU Avg | CPU Max | MEM Avg | MEM Max |
+|   ---     | ---  |     ---     |     ---      |   ---   |   ---   |   ---    |   ---   |   ---   |  ---  |   ---   |  ---   |   ---   |   ---   |   ---   |   ---   |
+| fasthttp  |  go  | 457150 100% | 1534.21 100% | 9.04us  | 21.78ms | 46.02ms  | 23.72ms | 30.96ms | 4.37s | 2000000 |   0    | 297.97  | 298.97  | 193.60M | 194.32M |
+|   fib     |  go  | 364725  79% | 1319.49  86% | 20.88us | 27.30ms | 363.22ms | 45.21ms | 54.31ms | 5.48s | 2000000 |   0    | 276.41  | 277.98  | 89.22M  | 94.27M  |
+| nethttp   |  go  | 298872  65% | 1039.90  67% | 7.50us  | 33.32ms | 71.90ms  | 43.67ms | 48.26ms | 6.69s | 2000000 |   0    | 287.40  | 295.97  | 315.14M | 315.88M |
+|   gin     |  go  | 294209  64% | 1005.20  65% | 7.92us  | 33.86ms | 66.20ms  | 43.68ms | 47.18ms | 6.80s | 2000000 |   0    | 292.69  | 296.97  | 318.62M | 318.99M |
 
-| Framework |   TPS [↓1]   |   EER [↓2]   | Req Sent | Bytes Sent | Resp Recv | Bytes Recv | CPU Avg | CPU Max | MEM Avg | MEM Max |
-|   ---     |     ---      |     ---      |   ---    |    ---     |    ---    |    ---     |   ---   |   ---   |   ---   |   ---   |
-| fasthttp  | 1990000 100% | 6826.59 100% | 19900000 |   18.98G   | 19900000  |   18.98G   | 291.51  | 298.97  | 195.42M | 196.68M |
-|   fib     | 1143488  57% | 4165.12  61% | 11626730 |   11.09G   | 11434880  |   10.91G   | 274.54  | 285.96  | 630.26M | 934.54M |
-| nethttp   |  470849  23% | 1612.81  23% | 5031820  |   4.80G    |  4708491  |   4.49G    | 291.94  | 298.97  | 338.23M | 353.10M |
-|   gin     |  467244  23% | 1600.57  23% | 4991820  |   4.76G    |  4672446  |   4.46G    | 291.92  | 298.97  | 343.14M | 358.48M |
+| Framework | Lang |   TPS [↓1]   |   EER [↓2]   | Req Sent | Bytes Sent | Resp Recv | Bytes Recv | CPU Avg | CPU Max | MEM Avg | MEM Max |
+|   ---     | ---  |     ---      |     ---      |   ---    |    ---     |    ---    |    ---     |   ---   |   ---   |   ---   |   ---   |
+| fasthttp  |  go  | 1990000 100% | 6826.59 100% | 19900000 |   18.98G   | 19900000  |   18.98G   | 291.51  | 298.97  | 195.42M | 196.68M |
+|   fib     |  go  | 1143488  57% | 4165.12  61% | 11626730 |   11.09G   | 11434880  |   10.91G   | 274.54  | 285.96  | 630.26M | 934.54M |
+| nethttp   |  go  |  470849  23% | 1612.81  23% | 5031820  |   4.80G    |  4708491  |   4.49G    | 291.94  | 298.97  | 338.23M | 353.10M |
+|   gin     |  go  |  467244  23% | 1600.57  23% | 4991820  |   4.76G    |  4672446  |   4.46G    | 291.92  | 298.97  | 343.14M | 358.48M |

@@ -308,14 +308,14 @@ func Fields(r Report, enableTPN bool, filter func(string) bool) []string {
 
 func GenerateConnectionsReports(preffix, suffix string, enableTPN bool, order string, filter func(string) bool) string {
 	create := func(framework string) Report {
-		return &ConnectionsReport{Framework: framework}
+		return &ConnectionsReport{Framework: framework, Lang: config.FrameworkLang(framework)}
 	}
 	return GenerateReports(preffix, suffix, enableTPN, order, create, filter)
 }
 
 func GenerateBenchEchoReports(preffix, suffix string, enableTPN bool, order string, filter func(string) bool) string {
 	create := func(framework string) Report {
-		return &BenchEchoReport{Framework: framework}
+		return &BenchEchoReport{Framework: framework, Lang: config.FrameworkLang(framework)}
 	}
 	return GenerateReports(preffix, suffix, enableTPN, order, create, filter)
 }
@@ -326,21 +326,21 @@ func GenerateBenchRateReports(preffix, suffix string, enableTPN bool, order stri
 
 func ReadConnectionsReports(preffix, suffix string) []Report {
 	create := func(framework string) Report {
-		return &ConnectionsReport{Framework: framework}
+		return &ConnectionsReport{Framework: framework, Lang: config.FrameworkLang(framework)}
 	}
 	return ReadReports(preffix, suffix, create)
 }
 
 func ReadBenchEchoReports(preffix, suffix string) []Report {
 	create := func(framework string) Report {
-		return &BenchEchoReport{Framework: framework}
+		return &BenchEchoReport{Framework: framework, Lang: config.FrameworkLang(framework)}
 	}
 	return ReadReports(preffix, suffix, create)
 }
 
 func ReadBenchRateReports(preffix, suffix string) []Report {
 	create := func(framework string) Report {
-		return &BenchRateReport{Framework: framework}
+		return &BenchRateReport{Framework: framework, Lang: config.FrameworkLang(framework)}
 	}
 	reports := ReadReports(preffix, suffix, create)
 	for _, r := range reports {
@@ -368,6 +368,9 @@ func ReadReports(preffix, suffix string, create func(framework string) Report) [
 			continue
 		}
 
+		// Over a report create has filled in, so that a field the file does
+		// not carry keeps what create gave it: Lang, in a report written
+		// before there was a Lang column.
 		err = json.Unmarshal(b, reportItem)
 		if err != nil {
 			// logging.Printf("Unmarshal Report %v failed: %v", v, err)

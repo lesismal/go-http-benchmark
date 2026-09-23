@@ -18,6 +18,7 @@ var (
 // first.
 type BenchRateReport struct {
 	Framework    string  `json:"Framework" md:"Framework"`
+	Lang         string  `json:"Lang" md:"Lang"`
 	BenchClient  string  `json:"BenchClient" md:"Client" fmt:"client" summary:"Client"`
 	Duration     int64   `json:"Duration" md:"Duration" fmt:"duration" summary:"Rate Duration"`
 	TPS          int64   `json:"TPS" md:"TPS" rank:"1"`

@@ -133,6 +133,7 @@ func (cs *Connections) Report() report.Report {
 	r := &report.ConnectionsReport{
 		BenchClient: "benchcli-go",
 		Framework:   cs.Framework,
+		Lang:        config.FrameworkLang(cs.Framework),
 		TPS:         cs.Calculator.TPS(),
 		Min:         cs.Calculator.Min,
 		Avg:         cs.Calculator.Avg,

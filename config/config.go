@@ -61,6 +61,26 @@ var FrameworkList = []string{
 	NetHTTP,
 }
 
+// Langs is the programming language each framework's server is written in,
+// as the reports' Lang column shows it: lower case, e.g. "go", "rust" or
+// "c++".
+var Langs = map[string]string{
+	Axum:     "rust",
+	Fasthttp: "go",
+	Fib:      "go",
+	Gin:      "go",
+	NetHTTP:  "go",
+}
+
+// FrameworkLang is framework's language, or "-" for a framework Langs does
+// not know, such as one a report file names that this build has dropped.
+func FrameworkLang(framework string) string {
+	if lang, ok := Langs[framework]; ok {
+		return lang
+	}
+	return "-"
+}
+
 // EchoPath is the route every server answers the benchmark on: the response
 // body is the request body, byte for byte, with a Content-Length.
 const EchoPath = "/echo"

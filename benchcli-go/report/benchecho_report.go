@@ -13,6 +13,7 @@ var (
 // EER (rank:"2"), the one that spent less CPU on it first.
 type BenchEchoReport struct {
 	Framework    string  `json:"Framework" md:"Framework"`
+	Lang         string  `json:"Lang" md:"Lang"`
 	BenchClient  string  `json:"BenchClient" md:"Client" fmt:"client" summary:"Client"`
 	TPS          int64   `json:"TPS" md:"TPS" rank:"1"`
 	EER          float64 `json:"EER" md:"EER" rank:"2"`

@@ -3,6 +3,7 @@ package report
 import (
 	"math"
 	"math/rand"
+	"os"
 	"reflect"
 	"strconv"
 	"strings"
@@ -445,8 +446,8 @@ func TestRankMarkersKeepTheColumnsInLine(t *testing.T) {
 // a plain column.
 func TestRateTPSIsPacketsPerSecond(t *testing.T) {
 	Init(false)
-	if got := BenchRateReportMarkdownHeaders[:3]; !equal(got, []string{"Framework", "TPS", "EER"}) {
-		t.Errorf("BenchPipeline columns start %v, want Framework, TPS, EER", got)
+	if got := BenchRateReportMarkdownHeaders[:4]; !equal(got, []string{"Framework", "Lang", "TPS", "EER"}) {
+		t.Errorf("BenchPipeline columns start %v, want Framework, Lang, TPS, EER", got)
 	}
 	if got := RateTPS(39809390, 10e9); got != 3980939 {
 		t.Errorf("RateTPS = %v, want 3980939", got)
@@ -505,5 +506,45 @@ func TestPercentOfFloats(t *testing.T) {
 		if !strings.Contains(table, cell) {
 			t.Errorf("no %q in:\n%s", cell, table)
 		}
+	}
+}
+
+// TestLangIsTheSecondColumn puts each framework's language right after its
+// name in all three tables, and gives a report file written before there was
+// a Lang column the language its framework has now.
+func TestLangIsTheSecondColumn(t *testing.T) {
+	Init(false)
+	for _, headers := range [][]string{ConnectionsReportMarkdownHeaders, BenchEchoReportMarkdownHeaders, BenchRateReportMarkdownHeaders} {
+		if got := headers[:2]; !equal(got, []string{"Framework", "Lang"}) {
+			t.Errorf("columns start %v, want Framework, Lang", got)
+		}
+	}
+	table := Markdown([]Report{
+		&BenchEchoReport{Framework: "nethttp", Lang: "go", TPS: 10},
+		&BenchEchoReport{Framework: "axum", Lang: "rust", TPS: 20},
+	}, false, SortResult, nil)
+	if !rowOrder(table, "axum", "rust", "nethttp", "go") {
+		t.Errorf("Lang does not follow each Framework:\n%s", table)
+	}
+	if summary := Summary([]Report{&BenchEchoReport{Framework: "axum", Lang: "rust"}}); strings.Contains(summary, "Lang") {
+		t.Errorf("Lang is a column, not a Summary parameter:\n%s", summary)
+	}
+
+	dir := t.TempDir()
+	wd, _ := os.Getwd()
+	defer os.Chdir(wd)
+	if err := os.Chdir(dir); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.MkdirAll("output/report", 0755); err != nil {
+		t.Fatal(err)
+	}
+	// Written before Lang existed: no such key in the file.
+	if err := os.WriteFile(Filename("axum-BenchEcho", "", ".json"), []byte(`{"Framework":"axum","TPS":5}`), 0644); err != nil {
+		t.Fatal(err)
+	}
+	reports := ReadBenchEchoReports("", "")
+	if len(reports) != 1 || reports[0].(*BenchEchoReport).Lang != "rust" {
+		t.Errorf("an old axum report read back as %+v, want Lang rust", reports)
 	}
 }
