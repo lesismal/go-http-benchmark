@@ -58,13 +58,18 @@ RUN if [ -n "$GO_PROXY" ]; then export GOPROXY="$GO_PROXY"; fi \
 # A mirror is written to CARGO_HOME's config rather than passed for this one
 # build: cargo caches what it downloads under the source it came from, so the
 # offline build in the container has to name the same source to find it.
+#
+# The Rust benchmark client is compiled here the same way, so that
+# BENCH_CLIENT=benchcli-rust builds offline too.
 ENV CARGO_TARGET_DIR=/tmp/cargo-target
 COPY frameworks/axum /workspace/frameworks/axum
+COPY benchcli-rust /workspace/benchcli-rust
 RUN if [ -n "$CARGO_MIRROR" ]; then \
         printf '[source.crates-io]\nreplace-with = "mirror"\n\n[source.mirror]\nregistry = "%s"\n' "$CARGO_MIRROR" \
             >> "$CARGO_HOME/config.toml"; \
     fi \
-    && cargo build --release --locked --manifest-path frameworks/axum/Cargo.toml
+    && cargo build --release --locked --manifest-path frameworks/axum/Cargo.toml \
+    && cargo build --release --locked --manifest-path benchcli-rust/Cargo.toml
 
 COPY . .
 

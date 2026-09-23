@@ -9,7 +9,7 @@ if declare -F bench_owns_servers >/dev/null && ! bench_owns_servers; then
     # on a machine whose servers are already up their binaries are still
     # running and their logs are still being written. Only what this half owns.
     rm -rf ./output/report
-    rm -f ./output/bin/bench.client
+    rm -f ./output/bin/bench.client ./output/bin/bench.report
 else
     rm -rf ./output
 fi

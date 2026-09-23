@@ -7,7 +7,7 @@ the same scripts, the same Go client structure, and the same report format.
 
 | Framework | Package | Server |
 | --- | --- | --- |
-| `axum` | [axum](https://crates.io/crates/axum) (Rust) | `axum::serve` on tokio's multi-threaded runtime, one listener per port, one worker thread per CPU the process may run on |
+| `axum` | [github.com/tokio-rs/axum](https://github.com/tokio-rs/axum) (Rust) | `axum::serve` on tokio's multi-threaded runtime, one listener per port, one worker thread per CPU the process may run on |
 | `fasthttp` | [github.com/valyala/fasthttp](https://github.com/valyala/fasthttp) | one `fasthttp.Server` serving every port |
 | `fib` | [github.com/lesismal/fib/go](https://github.com/lesismal/fib) | one fib engine bound to every port, HTTP/1 handler from `fib/go/http` |
 | `gin` | [github.com/gin-gonic/gin](https://github.com/gin-gonic/gin) | `gin.New()` (no logger or recovery middleware) on `net/http` |
@@ -32,8 +32,9 @@ GC to limit. Its port range is a constant in `src/main.rs`, which a test in
 
 ## What is measured
 
-The Go client, [`benchcli-go`](benchcli-go), runs three benchmarks one after
-another on the same keep-alive connections:
+The benchmark client runs three benchmarks one after another on the same
+keep-alive connections. There are two clients, which run them the same way
+(see [Benchmark client](#benchmark-client)):
 
 | Benchmark | What it does | TPS is |
 | --- | --- | --- |
@@ -66,6 +67,38 @@ client. On a single-node run, whatever the client spends on each request
 comes out of the machine the server runs on. `-check=true` compares every
 response body with the request that was sent.
 
+## Benchmark client
+
+`script/config.sh` selects the client with `BENCH_CLIENT`:
+
+| `BENCH_CLIENT` | client | Summary `Client` |
+| --- | --- | --- |
+| `benchcli-rust` (default) | [`benchcli-rust`](benchcli-rust): Rust, on [tokio](https://github.com/tokio-rs/tokio), the runtime [axum](https://github.com/tokio-rs/axum) runs on; needs cargo | `rust` |
+| `benchcli-go` | [`benchcli-go`](benchcli-go): Go, goroutines | `go` |
+
+```sh
+BENCH_CLIENT=benchcli-go bash script/benchmark.sh
+```
+
+Both clients take the same flags, run the same three benchmarks the same way,
+and write the same JSON report files. `benchcli-rust` computes TPS, latencies,
+percentiles and the CPU/MEM columns exactly as perf does for the Go client,
+and samples the server the same way, locally or over `/init` and `/ps`. Tests
+in `config` and `report` keep its framework table and report field names in
+step with the Go definitions.
+
+The report step is the Go client's in either case: `script/build.sh` always
+builds it as `output/bin/bench.report`, and `script/report.sh` runs that on
+whatever the measuring client wrote. That gives one report format with one
+implementation.
+
+Neither client uses an HTTP client library. axum is a server framework with
+no client of its own, and hyper's client, which axum is built on, sends one
+request at a time on a connection, so it could not run `BenchPipeline`.
+`benchcli-rust` speaks HTTP/1.1 over tokio's TCP the way `benchcli-go` does
+over Go's. The `-el` and `-rl` limits allow that many requests per second
+there, which is what their usage text says.
+
 `EER` is throughput per percent of a CPU core: `TPS / CPU Avg`. The server's
 CPU and memory are sampled every `-pi` ms. `-ps=auto` (the default) samples the
 server process from the client side when it runs on the same machine, and asks
@@ -75,9 +108,10 @@ CPU, MEM and EER columns read 0. The client logs a message when that happens.
 
 ## Run
 
-Go 1.27 or later, and for `axum` a Rust toolchain (cargo 1.85 or later; see
-[rustup.rs](https://rustup.rs)). Without cargo, leave axum out with
-`BENCH_FRAMEWORKS`, e.g. `BENCH_FRAMEWORKS=fasthttp,fib,gin,nethttp`. From the
+Go 1.27 or later, and a Rust toolchain (cargo 1.85 or later; see
+[rustup.rs](https://rustup.rs)) for the default client, `benchcli-rust`, and
+for the `axum` server. Without cargo, use the Go client and leave axum out:
+`BENCH_CLIENT=benchcli-go BENCH_FRAMEWORKS=fasthttp,fib,gin,nethttp`. From the
 repository root:
 
 ```sh

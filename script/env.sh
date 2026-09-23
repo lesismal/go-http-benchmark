@@ -135,6 +135,7 @@ print_env() {
     echo "role: ${BENCH_ROLE} (servers: $(bench_runs_servers && echo here || echo elsewhere), clients: $(bench_runs_clients && echo here || echo elsewhere))"
     echo "server host: ${BENCH_SERVER_HOST}"
     echo $line
+    echo "benchmark client: ${BENCH_CLIENT}"
     echo "frameworks: ${frameworks[*]}"
     echo $line
     echo "report sort: ${BENCH_REPORT_SORT} (result = best first, framework = config.FrameworkList order)"

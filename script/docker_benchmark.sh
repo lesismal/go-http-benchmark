@@ -18,6 +18,7 @@ Options:
   -h, --help    Show this help.
 
 Environment overrides:
+  BENCH_CLIENT             benchcli-rust (default) or benchcli-go
   BENCH_FRAMEWORKS         Comma-separated framework subset
   BENCH_REPORT_SORT        Report row order: result (default, best first) or
                            framework (see script/config.sh)
@@ -210,6 +211,8 @@ run_args=(
     # Without this the container would write its tables in the default order
     # however the caller set it out here.
     --env "BENCH_REPORT_SORT=$BENCH_REPORT_SORT"
+    # And the client, which the image has both of.
+    --env "BENCH_CLIENT=$BENCH_CLIENT"
 )
 if [ -n "$run_frameworks" ]; then
     run_args+=(--env "BENCH_FRAMEWORKS=$run_frameworks")
@@ -275,7 +278,7 @@ Server CPUs: $server_cpu_list
 Client CPUs: $client_cpu_list
 Docker memory available: $daemon_memory_bytes bytes
 Container memory limit: $memory_description
-Benchmark client: benchcli-go
+Benchmark client: $BENCH_CLIENT
 Frameworks: ${run_frameworks:-all}
 EOF
 cat "$result_dir/resources.txt"

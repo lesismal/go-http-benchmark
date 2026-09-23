@@ -26,8 +26,15 @@ build_benchmark() {
     fi
 
     if bench_runs_clients; then
-        echo "build client: benchcli-go ..."
-        go build -o ./output/bin/bench.client ./benchcli-go || return 1
+        # The Go client is also the report step's, whichever client measures:
+        # script/report.sh runs it as bench.report.
+        echo "build report: benchcli-go ..."
+        go build -o ./output/bin/bench.report ./benchcli-go || return 1
+        echo "build client: ${BENCH_CLIENT} ..."
+        case "$BENCH_CLIENT" in
+            benchcli-go) cp ./output/bin/bench.report ./output/bin/bench.client || return 1 ;;
+            benchcli-rust) bash ./benchcli-rust/build.sh "$(pwd)/output/bin/bench.client" || return 1 ;;
+        esac
         echo "build client done"
     else
         echo "skip building the client: it runs elsewhere"

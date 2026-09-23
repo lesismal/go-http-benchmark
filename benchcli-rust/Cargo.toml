@@ -1,0 +1,22 @@
+[package]
+name = "benchcli-rust"
+version = "0.1.0"
+edition = "2024"
+publish = false
+rust-version = "1.85"
+
+[[bin]]
+name = "benchcli-rust"
+path = "src/main.rs"
+
+[dependencies]
+tokio = { version = "1", features = ["rt-multi-thread", "net", "time", "sync", "macros", "io-util"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+libc = "0.2"
+
+[profile.release]
+opt-level = 3
+codegen-units = 1
+lto = "fat"
+panic = "abort"

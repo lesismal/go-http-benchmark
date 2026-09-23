@@ -21,6 +21,8 @@ fi
 
 echo "generate report ..."
 echo
-./output/bin/bench.client -r=true ${report_sort_flag} "$@"
+# The Go client, whichever client measured: benchcli-rust writes the same
+# JSON files and leaves the tables to it. See script/build.sh.
+./output/bin/bench.report -r=true ${report_sort_flag} "$@"
 echo
 echo "generate report done"

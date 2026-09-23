@@ -1,5 +1,17 @@
 #!/bin/bash
 
+# Benchmark client: benchcli-rust (default) or benchcli-go. Both run the same
+# three benchmarks with the same flags and write the same JSON report files;
+# the report step turns them into tables with the Go client either way, so
+# one run's tables can hold rows from both. benchcli-rust needs cargo; on a
+# machine without it, use the Go one.
+# Override for one run with: BENCH_CLIENT=benchcli-go bash script/benchmark.sh
+BENCH_CLIENT=${BENCH_CLIENT:-benchcli-rust}
+case "$BENCH_CLIENT" in
+    benchcli-go|benchcli-rust) ;;
+    *) echo "Unsupported BENCH_CLIENT: $BENCH_CLIENT (want benchcli-go or benchcli-rust)" >&2; return 1 ;;
+esac
+
 # Where the servers are, as the clients should reach them: an address or a
 # hostname, IPv6 included. The default keeps a single-node run on loopback.
 # The servers always bind every interface, so a two-node run configures only
@@ -81,7 +93,7 @@ SleepTime=5
 # that a framework is in the same place in every list and a new one has one
 # obvious place to go.
 #
-#   axum      https://crates.io/crates/axum, a Rust server on tokio; building
+#   axum      github.com/tokio-rs/axum, a Rust server on tokio; building
 #             it needs cargo (see frameworks/axum/build.sh)
 #   fasthttp  github.com/valyala/fasthttp
 #   fib       github.com/lesismal/fib/go, its HTTP/1 server (fib/go/http)
