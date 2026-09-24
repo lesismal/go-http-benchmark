@@ -176,7 +176,7 @@ fi
 run_frameworks=${BENCH_FRAMEWORKS:-}
 if [ "$smoke" = true ]; then
     run_frameworks=nethttp
-    smoke_args=(-c=100 -dc=20 -ec=50 -en=2000 -b=512 -rate=true -rc=10 -rd=1 -rr=20 -ep=false -rp=false)
+    smoke_args=(-c=100 -dc=20 -ec=50 -en=2000 -b=512 -rate=true -rc=10 -rd=1 -rr=20)
     if [ "${#benchmark_args[@]}" -gt 0 ]; then
         benchmark_args=("${smoke_args[@]}" "${benchmark_args[@]}")
     else
