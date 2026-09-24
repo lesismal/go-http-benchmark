@@ -59,7 +59,7 @@ impl Default for Flags {
             echo_concurrency: 10000,
             echo_times: 2000000,
             echo_tps_limit: 0,
-            echo_pprof: true,
+            echo_pprof: false,
             echo_pprof_duration: 5,
             rate_enabled: false,
             rate_concurrency: 10000,
@@ -154,11 +154,7 @@ const FLAGS: &[(&str, Kind, &str)] = &[
         "benchecho: benchmark times (default 2000000)",
     ),
     ("el", Kind::Value, "benchecho: TPS limitation per second"),
-    (
-        "ep",
-        Kind::Bool,
-        "benchecho: generate pprof report (default true)",
-    ),
+    ("ep", Kind::Bool, "benchecho: generate pprof report"),
     ("epd", Kind::Value, "benchecho: pprof duration (default 5)"),
     ("rate", Kind::Bool, "benchrate: whether run benchrate"),
     (
@@ -359,7 +355,7 @@ mod tests {
             "-c",
             "100",
             "--check",
-            "-ep=false",
+            "-ep=true",
             "-dt=1m30s",
             "-rpl=25",
         ];
@@ -367,7 +363,8 @@ mod tests {
         assert_eq!(f.framework, "axum");
         assert_eq!(f.num_connections, 100);
         assert!(f.check_valid);
-        assert!(!f.echo_pprof);
+        assert!(f.echo_pprof);
+        assert!(!Flags::default().echo_pprof);
         assert_eq!(f.dial_timeout, Duration::from_secs(90));
         assert_eq!(f.rate_pipeline, 25);
     }
