@@ -88,6 +88,8 @@ pub struct BenchEchoReport {
     pub concurrency: usize,
     #[serde(rename = "Payload")]
     pub payload: usize,
+    #[serde(rename = "Pprof")]
+    pub pprof: bool,
     #[serde(rename = "CPUMin")]
     pub cpu_min: f64,
     #[serde(rename = "CPUAvg")]
@@ -136,6 +138,8 @@ pub struct BenchRateReport {
     pub pipeline: usize,
     #[serde(rename = "Payload")]
     pub payload: usize,
+    #[serde(rename = "Pprof")]
+    pub pprof: bool,
     #[serde(rename = "CPUMin")]
     pub cpu_min: f64,
     #[serde(rename = "CPUAvg")]

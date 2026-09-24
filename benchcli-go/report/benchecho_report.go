@@ -32,6 +32,7 @@ type BenchEchoReport struct {
 	Connections  int     `json:"Conns" md:"Conns" summary:"Conns"`
 	Concurrency  int     `json:"Concurrency" md:"Concurrency" summary:"Echo Concurrency"`
 	Payload      int     `json:"Payload" md:"Payload" summary:"Payload"`
+	Pprof        bool    `json:"Pprof" md:"Pprof" summary:"Echo Pprof"`
 	CPUMin       float64 `json:"CPUMin" md:"-" fmt:"cpu"`
 	CPUAvg       float64 `json:"CPUAvg" md:"CPU Avg" fmt:"cpu"`
 	CPUMax       float64 `json:"CPUMax" md:"CPU Max" fmt:"cpu"`

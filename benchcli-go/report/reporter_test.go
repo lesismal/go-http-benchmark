@@ -267,8 +267,8 @@ func TestSummaryTakesTheParametersOutOfTheTables(t *testing.T) {
 		&ConnectionsReport{Framework: "gin", BenchClient: "benchcli-go", TPS: 7, Concurrency: 2000},
 	}
 	echo := []Report{
-		&BenchEchoReport{Framework: "fib", BenchClient: "benchcli-go", Connections: 20000, Concurrency: 10000, Total: 2000000, Payload: 1024},
-		&BenchEchoReport{Framework: "fasthttp", BenchClient: "benchcli-go", Connections: 19998, Concurrency: 10000, Total: 2000000, Payload: 1024},
+		&BenchEchoReport{Framework: "fib", BenchClient: "benchcli-go", Connections: 20000, Concurrency: 10000, Total: 2000000, Payload: 1024, Pprof: true},
+		&BenchEchoReport{Framework: "fasthttp", BenchClient: "benchcli-go", Connections: 19998, Concurrency: 10000, Total: 2000000, Payload: 1024, Pprof: true},
 	}
 	rate := []Report{
 		&BenchRateReport{Framework: "fib", BenchClient: "benchcli-go", Duration: 10e9, Connections: 20000, Concurrency: 5000, SendRate: 200, Pipeline: 10, Payload: 1024},
@@ -276,14 +276,15 @@ func TestSummaryTakesTheParametersOutOfTheTables(t *testing.T) {
 	summary := Summary(conns, echo, rate)
 	rows := []string{"Project", "GO-HTTP1-BENCHMARK", "Client", "go", "Conns", "20000 (fib); 19998 (fasthttp)",
 		"Payload", "1024", "Dial Concurrency", "2000", "Echo Concurrency", "10000", "Echo Total", "2000000",
-		"Rate Concurrency", "5000", "Rate Duration", "10.00s", "Rate SendRate", "200", "Rate Pipeline", "10"}
+		"Echo Pprof", "true", "Rate Concurrency", "5000", "Rate Duration", "10.00s", "Rate SendRate", "200",
+		"Rate Pipeline", "10", "Rate Pprof", "false"}
 	if !rowOrder(summary, rows...) {
 		t.Errorf("Summary does not read %v:\n%s", rows, summary)
 	}
 
 	for _, table := range []string{Markdown(conns, false, SortResult, nil), Markdown(echo, false, SortResult, nil),
 		Markdown(rate, false, SortResult, nil)} {
-		for _, column := range []string{"Client", "Conns", "Concurrency", "Payload", "Duration", "SendRate", "Pipeline"} {
+		for _, column := range []string{"Client", "Conns", "Concurrency", "Payload", "Duration", "SendRate", "Pipeline", "Pprof"} {
 			if strings.Contains(strings.SplitN(table, "\n", 2)[0], " "+column+" ") {
 				t.Errorf("table still has a %v column:\n%s", column, table)
 			}

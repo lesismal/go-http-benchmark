@@ -187,6 +187,7 @@ func main() {
 	be.Run()
 	defer be.Stop()
 	beReport := be.Report()
+	beReport.Pprof = *echoPprof
 	saveReport(beReport)
 	logging.Print(logging.ShortLine)
 	logging.Print(beReport.String(*enableTPN))
@@ -224,6 +225,7 @@ func main() {
 		br.Run()
 		defer br.Stop()
 		brReport := br.Report()
+		brReport.Pprof = *ratePprof
 		saveReport(brReport)
 		logging.Print(logging.ShortLine)
 		logging.Print(brReport.String(*enableTPN))

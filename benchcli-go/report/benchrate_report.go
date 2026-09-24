@@ -32,6 +32,7 @@ type BenchRateReport struct {
 	SendRate     int     `json:"SendRate" md:"SendRate" summary:"Rate SendRate"`
 	Pipeline     int     `json:"Pipeline" md:"Pipeline" summary:"Rate Pipeline"`
 	Payload      int     `json:"Payload" md:"Payload" summary:"Payload"`
+	Pprof        bool    `json:"Pprof" md:"Pprof" summary:"Rate Pprof"`
 	CPUMin       float64 `json:"CPUMin" md:"-" fmt:"cpu"`
 	CPUAvg       float64 `json:"CPUAvg" md:"CPU Avg" fmt:"cpu"`
 	CPUMax       float64 `json:"CPUMax" md:"CPU Max" fmt:"cpu"`

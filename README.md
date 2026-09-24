@@ -192,9 +192,10 @@ flag that sets it, then one table per benchmark. The Summary's first row,
   column, floored so that only the best row reads `100%`.
 - Parameters shared by every row (`Client`, `Conns`, `Payload`, each
   benchmark's concurrency, `Echo Total`, `Rate Duration`, `Rate SendRate`,
-  `Rate Pipeline`) are in the Summary table instead of the columns. A
-  parameter the rows disagree on lists each value with its frameworks, for
-  example `20000 (fib); 19998 (fasthttp)`.
+  `Rate Pipeline`, and `Echo Pprof` / `Rate Pprof`, whether the client
+  fetched Go servers' pprof profiles, `-ep` / `-rp`) are in the Summary table
+  instead of the columns. A parameter the rows disagree on lists each value
+  with its frameworks, for example `20000 (fib); 19998 (fasthttp)`.
 - The JSON files keep every field, including `TP50`, `TP75`, `TP90`,
   `CPU Min` and `MEM Min`, which the tables leave out.
 
