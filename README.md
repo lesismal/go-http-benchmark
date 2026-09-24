@@ -10,7 +10,7 @@ the same scripts, the same Go client structure, and the same report format.
 | `axum` | [github.com/tokio-rs/axum](https://github.com/tokio-rs/axum) (Rust) | `axum::serve` on tokio's multi-threaded runtime, one listener per port, one worker thread per CPU the process may run on |
 | `beego` | [github.com/beego/beego/v2](https://github.com/beego/beego) (formerly `github.com/astaxie/beego`) | `web.NewControllerRegister()` on beego's default config (prod mode, no sessions, no gzip) on `net/http` |
 | `chi` | [github.com/go-chi/chi/v5](https://github.com/go-chi/chi) | `chi.NewRouter()` (no middleware) on `net/http` |
-| `echo` | [github.com/labstack/echo/v4](https://github.com/labstack/echo) | `echo.New()` (no middleware) on `net/http` |
+| `echo` | [github.com/labstack/echo/v5](https://github.com/labstack/echo) | `echo.New()` (no middleware) on `net/http` |
 | `fasthttp` | [github.com/valyala/fasthttp](https://github.com/valyala/fasthttp) | one `fasthttp.Server` serving every port |
 | `fib` | [github.com/lesismal/fib/go](https://github.com/lesismal/fib) | one fib engine bound to every port, HTTP/1 handler from `fib/go/http` |
 | `fiber` | [github.com/gofiber/fiber/v3](https://github.com/gofiber/fiber) | `fiber.New()` (no middleware); its one `fasthttp.Server` serves every port |

@@ -98,7 +98,7 @@ SleepTime=5
 #   beego       github.com/beego/beego/v2 (formerly github.com/astaxie/beego),
 #               its router, served by net/http
 #   chi         github.com/go-chi/chi/v5, served by net/http
-#   echo        github.com/labstack/echo/v4, served by net/http
+#   echo        github.com/labstack/echo/v5, served by net/http
 #   fasthttp    github.com/valyala/fasthttp
 #   fib         github.com/lesismal/fib/go, its HTTP/1 server (fib/go/http)
 #   fiber       github.com/gofiber/fiber/v3, served by fasthttp
