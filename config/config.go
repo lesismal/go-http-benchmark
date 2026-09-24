@@ -28,26 +28,42 @@ type InitArgs struct {
 // script/1m_conns_benchmark.sh, so that a framework sits in the same place in
 // all of them and a new one has one obvious place to go in each.
 const (
-	Axum     = "axum"
-	Fasthttp = "fasthttp"
-	Fib      = "fib"
-	Gin      = "gin"
-	NetHTTP  = "nethttp"
+	Axum       = "axum"
+	Beego      = "beego"
+	Chi        = "chi"
+	Echo       = "echo"
+	Fasthttp   = "fasthttp"
+	Fib        = "fib"
+	Fiber      = "fiber"
+	Gin        = "gin"
+	Goji       = "goji"
+	GorillaMux = "gorillamux"
+	HTTPRouter = "httprouter"
+	NetHTTP    = "nethttp"
 )
 
 // Ports is the range of benchmark ports each framework's server listens on.
 // Fifty of them, so that a client dialing a million connections from one
-// address does not run out of ephemeral ports towards any one of them.
+// address does not run out of ephemeral ports towards any one of them. A new
+// framework takes the next thousand after the last range handed out, so that
+// no range moves when one is added.
 //
 // axum is a Rust server and cannot import this map, so it carries its range
 // as FIRST_PORT and LAST_PORT in frameworks/axum/src/main.rs, which
 // TestAxumPortsMatch holds to the one here.
 var Ports = map[string]string{
-	Axum:     "14001:14050",
-	Fasthttp: "10001:10050",
-	Fib:      "11001:11050",
-	Gin:      "12001:12050",
-	NetHTTP:  "13001:13050",
+	Axum:       "14001:14050",
+	Beego:      "15001:15050",
+	Chi:        "16001:16050",
+	Echo:       "17001:17050",
+	Fasthttp:   "10001:10050",
+	Fib:        "11001:11050",
+	Fiber:      "18001:18050",
+	Gin:        "12001:12050",
+	Goji:       "19001:19050",
+	GorillaMux: "20001:20050",
+	HTTPRouter: "21001:21050",
+	NetHTTP:    "13001:13050",
 }
 
 // FrameworkList is every framework, in framework-name order. It is also the
@@ -55,9 +71,16 @@ var Ports = map[string]string{
 // same row in every table and across runs, whatever it scored.
 var FrameworkList = []string{
 	Axum,
+	Beego,
+	Chi,
+	Echo,
 	Fasthttp,
 	Fib,
+	Fiber,
 	Gin,
+	Goji,
+	GorillaMux,
+	HTTPRouter,
 	NetHTTP,
 }
 
@@ -65,11 +88,18 @@ var FrameworkList = []string{
 // as the reports' Lang column shows it: lower case, e.g. "go", "rust" or
 // "c++".
 var Langs = map[string]string{
-	Axum:     "rust",
-	Fasthttp: "go",
-	Fib:      "go",
-	Gin:      "go",
-	NetHTTP:  "go",
+	Axum:       "rust",
+	Beego:      "go",
+	Chi:        "go",
+	Echo:       "go",
+	Fasthttp:   "go",
+	Fib:        "go",
+	Fiber:      "go",
+	Gin:        "go",
+	Goji:       "go",
+	GorillaMux: "go",
+	HTTPRouter: "go",
+	NetHTTP:    "go",
 }
 
 // FrameworkLang is framework's language, or "-" for a framework Langs does

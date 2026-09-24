@@ -21,9 +21,16 @@ echo $line
 if [ -z "${BENCH_FRAMEWORKS:-}" ]; then
     frameworks=(
         "axum"
+        "beego"
+        "chi"
+        "echo"
         "fasthttp"
         "fib"
+        "fiber"
         "gin"
+        "goji"
+        "gorillamux"
+        "httprouter"
         "nethttp"
     )
 fi

@@ -8,9 +8,16 @@ use std::net::{IpAddr, ToSocketAddrs};
 /// one, line for line.
 pub const FRAMEWORKS: &[(&str, &str, u16, u16)] = &[
     ("axum", "rust", 14001, 14050),
+    ("beego", "go", 15001, 15050),
+    ("chi", "go", 16001, 16050),
+    ("echo", "go", 17001, 17050),
     ("fasthttp", "go", 10001, 10050),
     ("fib", "go", 11001, 11050),
+    ("fiber", "go", 18001, 18050),
     ("gin", "go", 12001, 12050),
+    ("goji", "go", 19001, 19050),
+    ("gorillamux", "go", 20001, 20050),
+    ("httprouter", "go", 21001, 21050),
     ("nethttp", "go", 13001, 13050),
 ];
 

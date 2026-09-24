@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/http/pprof"
 	"os"
+	"strconv"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -117,3 +118,25 @@ func ReadBody(body io.Reader, contentLength int64) (data []byte, bufp *[]byte, e
 	*bufp = buf[:0]
 	return buf, bufp, err
 }
+
+// Echo is the benchmark route as a plain net/http handler: nethttp's, and the
+// one every router here that dispatches to net/http handlers - chi, gorilla
+// mux, goji, httprouter - routes /echo to, so that among those the numbers
+// differ by the router alone.
+func Echo(w http.ResponseWriter, r *http.Request) {
+	body, bufp, err := ReadBody(r.Body, r.ContentLength)
+	defer BodyPool.Put(bufp)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	// Set, not left to net/http: it only works a Content-Length out for a
+	// body shorter than its 2KB chunking buffer, and sends a longer one
+	// chunked.
+	header := w.Header()
+	header["Content-Type"] = contentType
+	header["Content-Length"] = []string{strconv.Itoa(len(body))}
+	w.Write(body)
+}
+
+var contentType = []string{"application/octet-stream"}

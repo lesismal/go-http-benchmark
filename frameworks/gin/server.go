@@ -6,7 +6,6 @@ import (
 
 	"go-http-benchmark/config"
 	"go-http-benchmark/frameworks"
-	"go-http-benchmark/logging"
 
 	"github.com/gin-gonic/gin"
 )
@@ -23,21 +22,7 @@ func main() {
 	router := gin.New()
 	router.Any(config.EchoPath, onEcho)
 
-	var servers []*http.Server
-	for _, ln := range frameworks.ListenAll() {
-		server := &http.Server{Handler: router}
-		servers = append(servers, server)
-		go func() {
-			if err := server.Serve(ln); err != http.ErrServerClosed {
-				logging.Printf("server exit: %v", err)
-			}
-		}()
-	}
-
-	frameworks.WaitSignal()
-	for _, server := range servers {
-		server.Close()
-	}
+	frameworks.ServeNetHTTP(router)
 }
 
 func onEcho(c *gin.Context) {

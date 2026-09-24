@@ -109,6 +109,29 @@ func SetNoDelay(c net.Conn, nodelay bool) {
 	}
 }
 
+// ServeNetHTTP serves handler on every one of the framework's benchmark ports
+// until the server is told to stop, for the frameworks that are a router or a
+// context on top of net/http. One http.Server per port, all on the one
+// handler: net/http serves one listener per Serve call, and every call can
+// share the handler.
+func ServeNetHTTP(handler http.Handler) {
+	var servers []*http.Server
+	for _, ln := range ListenAll() {
+		server := &http.Server{Handler: handler}
+		servers = append(servers, server)
+		go func() {
+			if err := server.Serve(ln); err != http.ErrServerClosed {
+				logging.Printf("server exit: %v", err)
+			}
+		}()
+	}
+
+	WaitSignal()
+	for _, server := range servers {
+		server.Close()
+	}
+}
+
 // StartControlServer serves the control routes on the framework's control
 // port, on a net/http server of its own; see
 // config.GetFrameworkControlServerAddr.

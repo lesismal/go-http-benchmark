@@ -8,10 +8,24 @@ the same scripts, the same Go client structure, and the same report format.
 | Framework | Package | Server |
 | --- | --- | --- |
 | `axum` | [github.com/tokio-rs/axum](https://github.com/tokio-rs/axum) (Rust) | `axum::serve` on tokio's multi-threaded runtime, one listener per port, one worker thread per CPU the process may run on |
+| `beego` | [github.com/beego/beego/v2](https://github.com/beego/beego) (formerly `github.com/astaxie/beego`) | `web.NewControllerRegister()` on beego's default config (prod mode, no sessions, no gzip) on `net/http` |
+| `chi` | [github.com/go-chi/chi/v5](https://github.com/go-chi/chi) | `chi.NewRouter()` (no middleware) on `net/http` |
+| `echo` | [github.com/labstack/echo/v5](https://github.com/labstack/echo) | `echo.New()` (no middleware) on `net/http` |
 | `fasthttp` | [github.com/valyala/fasthttp](https://github.com/valyala/fasthttp) | one `fasthttp.Server` serving every port |
 | `fib` | [github.com/lesismal/fib/go](https://github.com/lesismal/fib) | one fib engine bound to every port, HTTP/1 handler from `fib/go/http` |
+| `fiber` | [github.com/gofiber/fiber/v3](https://github.com/gofiber/fiber) | `fiber.New()` (no middleware); its one `fasthttp.Server` serves every port |
 | `gin` | [github.com/gin-gonic/gin](https://github.com/gin-gonic/gin) | `gin.New()` (no logger or recovery middleware) on `net/http` |
+| `goji` | [github.com/zenazn/goji](https://github.com/zenazn/goji) | `web.New()` (not `goji.DefaultMux`, which adds a logger and a recoverer) on `net/http` |
+| `gorillamux` | [github.com/gorilla/mux](https://github.com/gorilla/mux) | `mux.NewRouter()` on `net/http` |
+| `httprouter` | [github.com/julienschmidt/httprouter](https://github.com/julienschmidt/httprouter) | `httprouter.New()` on `net/http` |
 | `nethttp` | `net/http` | one `http.Server` per port, all sharing one `ServeMux` |
+
+The servers built on `net/http` each run one `http.Server` per port, all on
+the framework's one router, and read the request body into a pooled buffer
+the same way. `chi`, `goji`, `gorillamux` and `httprouter` route `/echo` to
+the same `net/http` handler as `nethttp`, so among those the numbers differ by
+the router alone; `beego`, `echo` and `gin` write the response through their
+own context.
 
 Every server answers `POST /echo` with the request body, byte for byte, with a
 `Content-Length`. Each one listens on 50 ports (see `config.Ports`) so that a
@@ -111,7 +125,7 @@ CPU, MEM and EER columns read 0. The client logs a message when that happens.
 Go 1.27 or later, and a Rust toolchain (cargo 1.85 or later; see
 [rustup.rs](https://rustup.rs)) for the default client, `benchcli-rust`, and
 for the `axum` server. Without cargo, use the Go client and leave axum out:
-`BENCH_CLIENT=benchcli-go BENCH_FRAMEWORKS=fasthttp,fib,gin,nethttp`. From the
+`BENCH_CLIENT=benchcli-go BENCH_FRAMEWORKS=beego,chi,echo,fasthttp,fib,fiber,gin,goji,gorillamux,httprouter,nethttp`. From the
 repository root:
 
 ```sh

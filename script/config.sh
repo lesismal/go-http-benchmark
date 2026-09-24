@@ -93,17 +93,32 @@ SleepTime=5
 # that a framework is in the same place in every list and a new one has one
 # obvious place to go.
 #
-#   axum      github.com/tokio-rs/axum, a Rust server on tokio; building
-#             it needs cargo (see frameworks/axum/build.sh)
-#   fasthttp  github.com/valyala/fasthttp
-#   fib       github.com/lesismal/fib/go, its HTTP/1 server (fib/go/http)
-#   gin       github.com/gin-gonic/gin, served by net/http
-#   nethttp   the standard library's net/http
+#   axum        github.com/tokio-rs/axum, a Rust server on tokio; building
+#               it needs cargo (see frameworks/axum/build.sh)
+#   beego       github.com/beego/beego/v2 (formerly github.com/astaxie/beego),
+#               its router, served by net/http
+#   chi         github.com/go-chi/chi/v5, served by net/http
+#   echo        github.com/labstack/echo/v5, served by net/http
+#   fasthttp    github.com/valyala/fasthttp
+#   fib         github.com/lesismal/fib/go, its HTTP/1 server (fib/go/http)
+#   fiber       github.com/gofiber/fiber/v3, served by fasthttp
+#   gin         github.com/gin-gonic/gin, served by net/http
+#   goji        github.com/zenazn/goji, its web.Mux, served by net/http
+#   gorillamux  github.com/gorilla/mux, served by net/http
+#   httprouter  github.com/julienschmidt/httprouter, served by net/http
+#   nethttp     the standard library's net/http
 frameworks=(
     "axum"
+    "beego"
+    "chi"
+    "echo"
     "fasthttp"
     "fib"
+    "fiber"
     "gin"
+    "goji"
+    "gorillamux"
+    "httprouter"
     "nethttp"
 )
 
