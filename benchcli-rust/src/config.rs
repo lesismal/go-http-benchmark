@@ -33,6 +33,11 @@ pub fn lang(framework: &str) -> &'static str {
     find(framework).map_or("-", |f| f.1)
 }
 
+/// config.HasPprof: only the Go servers serve /debug/pprof/.
+pub fn has_pprof(framework: &str) -> bool {
+    lang(framework) == "go"
+}
+
 /// config.GetFrameworkBenchmarkAddrs: host:port for each benchmark port.
 pub fn benchmark_addrs(framework: &str, ip: &str) -> Vec<String> {
     let (_, _, first, last) = find(framework).expect("known framework");
@@ -194,6 +199,9 @@ mod tests {
         assert_eq!(control_port("axum"), 14051);
         assert_eq!(lang("axum"), "rust");
         assert_eq!(lang("nope"), "-");
+        assert!(has_pprof("nethttp"));
+        assert!(!has_pprof("axum"));
+        assert!(!has_pprof("nope"));
     }
 
     #[test]

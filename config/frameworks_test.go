@@ -32,6 +32,21 @@ func TestFrameworkListCoversLangs(t *testing.T) {
 	}
 }
 
+// Only Go servers serve /debug/pprof/, so only they are asked for profiles.
+func TestHasPprof(t *testing.T) {
+	for _, framework := range FrameworkList {
+		if got, want := HasPprof(framework), Langs[framework] == "go"; got != want {
+			t.Errorf("HasPprof(%v) = %v, want %v", framework, got, want)
+		}
+	}
+	if HasPprof(Axum) {
+		t.Errorf("HasPprof(%v) = true, want false", Axum)
+	}
+	if HasPprof("no-such-framework") {
+		t.Errorf("HasPprof of an unknown framework = true, want false")
+	}
+}
+
 // A framework with no ports is one the clients cannot reach, and a port range
 // with no framework is one nothing runs on: the two lists have to carry the
 // same names.

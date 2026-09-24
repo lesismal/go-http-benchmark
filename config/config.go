@@ -81,6 +81,13 @@ func FrameworkLang(framework string) string {
 	return "-"
 }
 
+// HasPprof reports whether framework's server serves /debug/pprof/: only the
+// Go ones do, on the net/http control server they share. The clients do not
+// ask any other server for a profile.
+func HasPprof(framework string) bool {
+	return FrameworkLang(framework) == "go"
+}
+
 // EchoPath is the route every server answers the benchmark on: the response
 // body is the request body, byte for byte, with a Content-Length.
 const EchoPath = "/echo"

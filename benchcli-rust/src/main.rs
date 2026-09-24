@@ -181,10 +181,17 @@ async fn run(f: flags::Flags) {
     let control_host = f.ip.clone();
     let control_port = config::control_port(&fw);
     let control_url = format!("http://{}:{control_port}", config::url_host(&f.ip));
-    println!("pprof cpu :\n  curl --output ./cpu_profile {control_url}/debug/pprof/profile");
-    println!("  go tool pprof -http=:6060 ./cpu_profile");
-    println!("pprof heap:\n  curl --output ./mem_profile {control_url}/debug/pprof/heap");
-    println!("  go tool pprof -http=:6061 ./mem_profile");
+    // Only a Go server serves /debug/pprof/; any other is not asked for a
+    // profile at all, rather than asked and logged as failing every run.
+    let has_pprof = config::has_pprof(&fw);
+    if has_pprof {
+        println!("pprof cpu :\n  curl --output ./cpu_profile {control_url}/debug/pprof/profile");
+        println!("  go tool pprof -http=:6060 ./cpu_profile");
+        println!("pprof heap:\n  curl --output ./mem_profile {control_url}/debug/pprof/heap");
+        println!("  go tool pprof -http=:6061 ./mem_profile");
+    } else {
+        logf!("{fw}: {lang} server, no /debug/pprof/, pprof profiles are not fetched");
+    }
     print(SHORT_LINE);
 
     // The Go client's pprof hooks: two seconds into the phase, a CPU profile
@@ -233,7 +240,7 @@ async fn run(f: flags::Flags) {
     let payload = if f.payload == 0 { 1024 } else { f.payload };
     let conns_len = cs.conns.len();
     let be = bench::echo(cs.conns, echo_cfg, Arc::clone(&dialer), || {
-        if f.echo_pprof {
+        if f.echo_pprof && has_pprof {
             fetch_pprof("BenchEcho", f.echo_pprof_duration, Arc::clone(&echo_pprof));
         }
     })
@@ -332,7 +339,7 @@ async fn run(f: flags::Flags) {
             ip: f.ip.clone(),
         };
         let br = bench::pipeline(be.conns, cfg, Arc::clone(&dialer), || {
-            if f.rate_pprof {
+            if f.rate_pprof && has_pprof {
                 fetch_pprof(
                     "BenchPipeline",
                     f.rate_pprof_duration,

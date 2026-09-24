@@ -24,11 +24,11 @@ requests never wait behind benchmark requests.
 `axum` is a Rust program in [`frameworks/axum`](frameworks/axum), so it cannot
 share the Go servers' control server. It serves `/init` and `/ps` itself, on
 its own control port, in the same JSON shape (only the `cpu` and `mem[].rss`
-fields, which are all the clients read). It has no `/debug/pprof/`, so the
-client's pprof fetch fails for axum and logs it. It takes the same `-nodelay`,
-`-reuseport` and `-b` flags; `-m` is accepted and ignored, since Rust has no
-GC to limit. Its port range is a constant in `src/main.rs`, which a test in
-`config` holds to `config.Ports`.
+fields, which are all the clients read). It has no `/debug/pprof/`; the
+clients fetch pprof profiles only from Go servers, so an axum run has none. It
+takes the same `-nodelay`, `-reuseport` and `-b` flags; `-m` is accepted and
+ignored, since Rust has no GC to limit. Its port range is a constant in
+`src/main.rs`, which a test in `config` holds to `config.Ports`.
 
 ## What is measured
 
