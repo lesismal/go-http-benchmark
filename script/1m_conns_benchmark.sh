@@ -30,6 +30,7 @@ if [ -z "${BENCH_FRAMEWORKS:-}" ]; then
         "gin"
         "goji"
         "gorillamux"
+        "hertz"
         "httprouter"
         "nethttp"
     )

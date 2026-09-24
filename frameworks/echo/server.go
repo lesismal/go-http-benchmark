@@ -7,7 +7,7 @@ import (
 	"go-http-benchmark/config"
 	"go-http-benchmark/frameworks"
 
-	"github.com/labstack/echo/v5"
+	"github.com/labstack/echo/v4"
 )
 
 func main() {
@@ -23,7 +23,7 @@ func main() {
 	frameworks.ServeNetHTTP(e)
 }
 
-func onEcho(c *echo.Context) error {
+func onEcho(c echo.Context) error {
 	r := c.Request()
 	body, bufp, err := frameworks.ReadBody(r.Body, r.ContentLength)
 	defer frameworks.BodyPool.Put(bufp)

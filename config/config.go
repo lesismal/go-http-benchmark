@@ -38,6 +38,7 @@ const (
 	Gin        = "gin"
 	Goji       = "goji"
 	GorillaMux = "gorillamux"
+	Hertz      = "hertz"
 	HTTPRouter = "httprouter"
 	NetHTTP    = "nethttp"
 )
@@ -62,6 +63,7 @@ var Ports = map[string]string{
 	Gin:        "12001:12050",
 	Goji:       "19001:19050",
 	GorillaMux: "20001:20050",
+	Hertz:      "22001:22050",
 	HTTPRouter: "21001:21050",
 	NetHTTP:    "13001:13050",
 }
@@ -80,6 +82,7 @@ var FrameworkList = []string{
 	Gin,
 	Goji,
 	GorillaMux,
+	Hertz,
 	HTTPRouter,
 	NetHTTP,
 }
@@ -98,6 +101,7 @@ var Langs = map[string]string{
 	Gin:        "go",
 	Goji:       "go",
 	GorillaMux: "go",
+	Hertz:      "go",
 	HTTPRouter: "go",
 	NetHTTP:    "go",
 }

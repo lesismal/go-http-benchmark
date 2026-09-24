@@ -17,6 +17,7 @@ pub const FRAMEWORKS: &[(&str, &str, u16, u16)] = &[
     ("gin", "go", 12001, 12050),
     ("goji", "go", 19001, 19050),
     ("gorillamux", "go", 20001, 20050),
+    ("hertz", "go", 22001, 22050),
     ("httprouter", "go", 21001, 21050),
     ("nethttp", "go", 13001, 13050),
 ];

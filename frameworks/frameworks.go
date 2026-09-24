@@ -57,28 +57,39 @@ func ServerAddrs() []string {
 // -nodelay=false; it is there for every framework that serves a net.Listener
 // so that the flag means the same thing to all of them.
 func Listen(network, addr string) (net.Listener, error) {
-	var ln net.Listener
-	var err error
-	if *reuse {
-		ln, err = reuseport.Listen(network, addr)
-	} else {
-		ln, err = net.Listen(network, addr)
-	}
-	if err != nil {
-		return nil, err
-	}
-	if *Nodelay {
-		return ln, nil
+	ln, err := listen(network, addr)
+	if err != nil || *Nodelay {
+		return ln, err
 	}
 	return &noDelayListener{Listener: ln}, nil
 }
 
+func listen(network, addr string) (net.Listener, error) {
+	if *reuse {
+		return reuseport.Listen(network, addr)
+	}
+	return net.Listen(network, addr)
+}
+
 // ListenAll listens on every one of the framework's benchmark ports.
 func ListenAll() []net.Listener {
+	return listenAll(Listen)
+}
+
+// ListenAllRaw is ListenAll without the -nodelay wrapper: the
+// *net.TCPListener each port was bound with, for a framework that takes the
+// listening descriptor over and polls it itself, as netpoll does. Such a
+// framework never calls the wrapper's Accept, so it has to apply -nodelay to
+// the connections it accepts on its own.
+func ListenAllRaw() []net.Listener {
+	return listenAll(listen)
+}
+
+func listenAll(listen func(network, addr string) (net.Listener, error)) []net.Listener {
 	addrs := ServerAddrs()
 	lns := make([]net.Listener, 0, len(addrs))
 	for _, addr := range addrs {
-		ln, err := Listen("tcp", addr)
+		ln, err := listen("tcp", addr)
 		if err != nil {
 			logging.Fatalf("listen %v failed: %v", addr, err)
 		}
