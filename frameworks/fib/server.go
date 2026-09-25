@@ -8,8 +8,8 @@ import (
 	"go-http-benchmark/frameworks"
 	"go-http-benchmark/logging"
 
-	fib "github.com/lesismal/fib/go"
-	fibhttp "github.com/lesismal/fib/go/http"
+	fib "github.com/lesismal/fib"
+	fibhttp "github.com/lesismal/fib/http"
 )
 
 func main() {

@@ -12,7 +12,7 @@ the same scripts, the same Go client structure, and the same report format.
 | `chi` | [github.com/go-chi/chi/v5](https://github.com/go-chi/chi) | `chi.NewRouter()` (no middleware) on `net/http` |
 | `echo` | [github.com/labstack/echo/v5](https://github.com/labstack/echo) | `echo.New()` (no middleware) on `net/http` |
 | `fasthttp` | [github.com/valyala/fasthttp](https://github.com/valyala/fasthttp) | one `fasthttp.Server` serving every port |
-| `fib` | [github.com/lesismal/fib/go](https://github.com/lesismal/fib) | one fib engine bound to every port, HTTP/1 handler from `fib/go/http` |
+| `fib` | [github.com/lesismal/fib](https://github.com/lesismal/fib) | one fib engine bound to every port, HTTP/1 handler from `fib/http` |
 | `fiber` | [github.com/gofiber/fiber/v3](https://github.com/gofiber/fiber) | `fiber.New()` (no middleware); its one `fasthttp.Server` serves every port |
 | `gin` | [github.com/gin-gonic/gin](https://github.com/gin-gonic/gin) | `gin.New()` (no logger or recovery middleware) on `net/http` |
 | `goji` | [github.com/zenazn/goji](https://github.com/zenazn/goji) | `web.New()` (not `goji.DefaultMux`, which adds a logger and a recoverer) on `net/http` |

@@ -100,7 +100,7 @@ SleepTime=5
 #   chi         github.com/go-chi/chi/v5, served by net/http
 #   echo        github.com/labstack/echo/v5, served by net/http
 #   fasthttp    github.com/valyala/fasthttp
-#   fib         github.com/lesismal/fib/go, its HTTP/1 server (fib/go/http)
+#   fib         github.com/lesismal/fib, its HTTP/1 server (fib/http)
 #   fiber       github.com/gofiber/fiber/v3, served by fasthttp
 #   gin         github.com/gin-gonic/gin, served by net/http
 #   goji        github.com/zenazn/goji, its web.Mux, served by net/http

@@ -83,8 +83,8 @@ github.com/labstack/echo/v5 v5.3.1 h1:75maCxkQVGualckLc/5s/ihgpH1a1Dc6AuGWNVNs6b
 github.com/labstack/echo/v5 v5.3.1/go.mod h1:4iEGNQiPPZnkfYpNR/L6fINd3NLiGWUD5+eBotFALas=
 github.com/leodido/go-urn v1.4.0 h1:WT9HwE9SGECu3lg4d/dIA+jxlljEa1/ffXKmRjqdmIQ=
 github.com/leodido/go-urn v1.4.0/go.mod h1:bvxc+MVxLKB4z00jd1z+Dvzr47oO32F/QSNjSBOlFxI=
-github.com/lesismal/fib/go v0.0.0-20260925033058-dddc36535bae h1:CcZqtuDoT4sm9eHGDpZFju7HqyPSgtN62m78dxgz7+s=
-github.com/lesismal/fib/go v0.0.0-20260925033058-dddc36535bae/go.mod h1:b1pauZmHbnnYd+kmEFzbkky9Z36an7ttGIDsAd/kwnI=
+github.com/lesismal/fib v0.0.0-20260925053615-180b6d22a084 h1:GoDtv4j/fOiWfOMTWMCAuf+6HmBRL9E88oV+veTCSM4=
+github.com/lesismal/fib v0.0.0-20260925053615-180b6d22a084/go.mod h1:ECyKMzlRaSlOWKBorTaEushOJZclLtclDlfONJxBB4U=
 github.com/lesismal/llib v1.2.4 h1:O9ih7VDnOB6KOP3r64DAJpMyMJ/bCKbzYI80VoXEV28=
 github.com/lesismal/llib v1.2.4/go.mod h1:70tFXXe7P1FZ02AU9l8LgSOK7d7sRrpnkUr3rd3gKSg=
 github.com/lesismal/nbio v1.7.0 h1:xIvxbxyXEgeoEvwyicIMCUi9NV1UfKxBOwPuQdzqXCY=
