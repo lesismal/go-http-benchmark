@@ -11,7 +11,7 @@ require (
 	github.com/gorilla/mux v1.8.1
 	github.com/julienschmidt/httprouter v1.3.0
 	github.com/labstack/echo/v5 v5.3.1
-	github.com/lesismal/fib/go v0.0.0-20260923144357-2d350b97fc33
+	github.com/lesismal/fib/go v0.0.0-20260925033058-dddc36535bae
 	github.com/lesismal/perf v0.0.0-20240508164715-fdb92a70ac1c
 	github.com/libp2p/go-reuseport v0.4.0
 	github.com/shirou/gopsutil v3.21.11+incompatible
@@ -46,7 +46,6 @@ require (
 	github.com/klauspost/compress v1.20.0 // indirect
 	github.com/klauspost/cpuid/v2 v2.3.0 // indirect
 	github.com/leodido/go-urn v1.4.0 // indirect
-	github.com/lesismal/fib v0.0.0-20260925033058-dddc36535bae // indirect
 	github.com/mattn/go-colorable v0.1.15 // indirect
 	github.com/mattn/go-isatty v0.0.24 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
