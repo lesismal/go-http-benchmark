@@ -131,7 +131,7 @@ func main() {
 	cpuProfileUrlEcho := ""
 	cpuProfileUrlRate := ""
 	memProfileUrl := ""
-	// How the server's CPU and MEM - and so EER - are sampled. On a run whose
+	// How the server's CPU and MEM - and so CPU EER and MEM EER - are sampled. On a run whose
 	// server is on this machine the client samples the process itself and the
 	// server is never asked; see config.SetupPS.
 	psSetup, err := config.SetupPS(*framework, *ip, *psMode, time.Millisecond*time.Duration(*psInterval))

@@ -11,7 +11,8 @@ import (
 	"github.com/lesismal/perf"
 )
 
-// Where a report's CPU and MEM columns - and so EER and EchoEER - come from.
+// Where a report's CPU and MEM columns - and so CPU EER and MEM EER - come
+// from.
 //
 // There are two ways to sample a server, and the difference is which machine
 // does it. Asking the server over its /ps route is the only way when it is on
@@ -19,10 +20,10 @@ import (
 // server is buried under a hundred thousand connections it has just finished
 // echoing to: that is precisely when it is most likely to be reset or
 // answered too late, and the columns that silently read 0 when it was took
-// EER down with them. A run whose server is on this machine does not need the
-// request at all - the client can read the process' own CPU and memory
-// straight from the operating system, which no amount of load on the server
-// can make fail.
+// the EERs down with them. A run whose server is on this machine does not
+// need the request at all - the client can read the process' own CPU and
+// memory straight from the operating system, which no amount of load on the
+// server can make fail.
 const (
 	// PSModeAuto samples the server here when it is running on this machine,
 	// and asks it over HTTP when it is not. The default.

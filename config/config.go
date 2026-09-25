@@ -239,8 +239,8 @@ func GetFrameworkBenchmarkAddrs(framework, ip string) ([]string, error) {
 // still arrive at a process that may be working through the backlog of a
 // just-finished rate test with a hundred thousand connections, which can make
 // it slow to accept or to answer. One attempt is not enough for that, and the
-// resource columns that silently read 0 when it failed took EER down with
-// them. So retry, patiently, and say what failed when it still does.
+// resource columns that silently read 0 when it failed took CPU EER down
+// with them. So retry, patiently, and say what failed when it still does.
 const (
 	controlAttempts = 4
 	controlTimeout  = 30 * time.Second

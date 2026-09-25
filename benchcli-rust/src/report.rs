@@ -56,8 +56,10 @@ pub struct BenchEchoReport {
     pub bench_client: String,
     #[serde(rename = "TPS")]
     pub tps: i64,
-    #[serde(rename = "EER")]
-    pub eer: f64,
+    #[serde(rename = "CPUEER")]
+    pub cpu_eer: f64,
+    #[serde(rename = "MEMEER")]
+    pub mem_eer: f64,
     #[serde(rename = "Min")]
     pub min: i64,
     #[serde(rename = "Avg")]
@@ -118,8 +120,10 @@ pub struct BenchRateReport {
     pub duration: i64,
     #[serde(rename = "TPS")]
     pub tps: i64,
-    #[serde(rename = "EchoEER")]
-    pub echo_eer: f64,
+    #[serde(rename = "CPUEER")]
+    pub cpu_eer: f64,
+    #[serde(rename = "MEMEER")]
+    pub mem_eer: f64,
     #[serde(rename = "SendTimes")]
     pub send_times: i64,
     #[serde(rename = "SendBytes")]

@@ -30,7 +30,7 @@ use crate::log::{LONG_LINE, SHORT_LINE, print};
 use crate::report::{
     BenchEchoReport, BenchRateReport, ConnectionsReport, client_name, cpu, dur, mem,
 };
-use crate::stats::{eer, rate_tps};
+use crate::stats::{cpu_eer, mem_eer, rate_tps};
 
 type Pprof = Arc<Mutex<Option<(Vec<u8>, Vec<u8>)>>>;
 
@@ -166,7 +166,7 @@ async fn run(f: flags::Flags) {
         );
     }
 
-    // How the server's CPU and MEM - and so EER - are sampled; see
+    // How the server's CPU and MEM - and so CPU EER and MEM EER - are sampled; see
     // config.SetupPS.
     let (ps_source, _server_pid, ps_err) = ps::setup(
         &fw,
@@ -247,7 +247,9 @@ async fn run(f: flags::Flags) {
     .await;
     let (samples, ps_err) = ps_source.ps_info().await;
     if let Some(err) = ps_err {
-        logf!("BenchEcho: resource statistics for {fw} incomplete, EER will read 0: {err}");
+        logf!(
+            "BenchEcho: resource statistics for {fw} incomplete, CPU EER and MEM EER will read 0: {err}"
+        );
     }
     let res = samples.resources();
     let c = &be.calc;
@@ -257,7 +259,8 @@ async fn run(f: flags::Flags) {
         lang: lang.clone(),
         bench_client: report::BENCH_CLIENT.into(),
         tps: c.tps(),
-        eer: eer(c.tps() as f64, res.cpu_avg),
+        cpu_eer: cpu_eer(c.tps() as f64, res.cpu_avg),
+        mem_eer: mem_eer(c.tps() as f64, res.mem_avg),
         min: c.min(),
         avg: c.avg(),
         max: c.max(),
@@ -298,7 +301,8 @@ async fn run(f: flags::Flags) {
             ("Lang", r.lang.clone(), false),
             ("Client", client_name(), false),
             ("TPS", r.tps.to_string(), false),
-            ("EER", format!("{:.2}", r.eer), false),
+            ("CPU EER", format!("{:.2}", r.cpu_eer), false),
+            ("MEM EER", format!("{:.2}", r.mem_eer), false),
             ("Min", dur(r.min), true),
             ("Avg", dur(r.avg), true),
             ("Max", dur(r.max), true),
@@ -370,7 +374,7 @@ async fn run(f: flags::Flags) {
         let (samples, ps_err) = ps_source.ps_info().await;
         if let Some(err) = ps_err {
             logf!(
-                "BenchPipeline: resource statistics for {fw} incomplete, EchoEER will read 0: {err}"
+                "BenchPipeline: resource statistics for {fw} incomplete, CPU EER and MEM EER will read 0: {err}"
             );
         }
         let res = samples.resources();
@@ -382,7 +386,8 @@ async fn run(f: flags::Flags) {
             bench_client: report::BENCH_CLIENT.into(),
             duration: duration_ns,
             tps: tps.floor() as i64,
-            echo_eer: eer(tps, res.cpu_avg),
+            cpu_eer: cpu_eer(tps, res.cpu_avg),
+            mem_eer: mem_eer(tps, res.mem_avg),
             send_times: br.send_times,
             send_bytes: br.send_bytes,
             recv_times: br.recv_times,
@@ -419,7 +424,8 @@ async fn run(f: flags::Flags) {
                 ("Client", client_name(), false),
                 ("Duration", dur(r.duration), false),
                 ("TPS", r.tps.to_string(), false),
-                ("EER", format!("{:.2}", r.echo_eer), false),
+                ("CPU EER", format!("{:.2}", r.cpu_eer), false),
+                ("MEM EER", format!("{:.2}", r.mem_eer), false),
                 ("Req Sent", r.send_times.to_string(), false),
                 ("Bytes Sent", mem(r.send_bytes as u64), false),
                 ("Resp Recv", r.recv_times.to_string(), false),

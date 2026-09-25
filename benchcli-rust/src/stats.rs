@@ -121,13 +121,24 @@ impl Samples {
     }
 }
 
-/// report.EER: throughput per percent of a core, or 0 with nothing to divide
-/// by.
-pub fn eer(throughput: f64, cpu_avg: f64) -> f64 {
-    if cpu_avg <= 0.0 || cpu_avg.is_nan() || !throughput.is_finite() {
+/// report.CPUEER: throughput per percent of a core, or 0 with nothing to
+/// divide by.
+pub fn cpu_eer(throughput: f64, cpu_avg: f64) -> f64 {
+    eer(throughput, cpu_avg)
+}
+
+/// report.MEMEER: throughput per MB (1<<20 bytes) of average RSS, or 0 with
+/// nothing to divide by.
+pub fn mem_eer(throughput: f64, mem_avg: u64) -> f64 {
+    eer(throughput, mem_avg as f64 / (1u64 << 20) as f64)
+}
+
+/// report.eer: throughput/cost, or 0 where that is not a finite number.
+fn eer(throughput: f64, cost: f64) -> f64 {
+    if cost <= 0.0 || cost.is_nan() || !throughput.is_finite() {
         return 0.0;
     }
-    let v = throughput / cpu_avg;
+    let v = throughput / cost;
     if v.is_finite() { v } else { 0.0 }
 }
 

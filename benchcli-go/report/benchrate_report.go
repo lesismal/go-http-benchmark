@@ -14,8 +14,9 @@ var (
 // back off the server per second: the rate benchmark pipelines requests at a
 // rate the clients set rather than to completion, so what the server answered
 // under that load is its result, the way TPS is in the other two. Rows with
-// the same TPS are ranked by EER (rank:"2"), the one that spent less CPU on it
-// first.
+// the same TPS are ranked by CPU EER (rank:"2"), the one that spent less CPU
+// on it first, and rows that tie on that too by MEM EER (rank:"3"), the one
+// that held less memory.
 //
 // Skipped marks a framework BenchPipeline was not run against, because its
 // server does not support pipelining (config.NoPipeline). Such a report
@@ -28,7 +29,8 @@ type BenchRateReport struct {
 	BenchClient  string  `json:"BenchClient" md:"Client" fmt:"client" summary:"Client"`
 	Duration     int64   `json:"Duration" md:"Duration" fmt:"duration" summary:"Rate Duration"`
 	TPS          int64   `json:"TPS" md:"TPS" rank:"1"`
-	EchoEER      float64 `json:"EchoEER" md:"EER" rank:"2"`
+	CPUEER       float64 `json:"CPUEER" md:"CPU EER" rank:"2"`
+	MEMEER       float64 `json:"MEMEER" md:"MEM EER" rank:"3"`
 	SendTimes    int64   `json:"SendTimes" md:"Req Sent"`
 	SendBytes    int64   `json:"SendBytes" md:"Bytes Sent" fmt:"mem"`
 	RecvTimes    int64   `json:"RecvTimes" md:"Resp Recv"`

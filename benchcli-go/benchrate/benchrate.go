@@ -208,7 +208,7 @@ func (br *BenchRate) Report() *report.BenchRateReport {
 	var psErr error
 	br.PsCounter, psErr = br.psInfo()
 	if psErr != nil {
-		logging.Printf("%v: resource statistics for %v incomplete, EchoEER will read 0: %v",
+		logging.Printf("%v: resource statistics for %v incomplete, CPU EER and MEM EER will read 0: %v",
 			report.BenchPipelineName, br.Framework, psErr)
 	}
 	if br.PsCounter != nil {
@@ -218,7 +218,9 @@ func (br *BenchRate) Report() *report.BenchRateReport {
 		r.MEMRSSMin = br.PsCounter.MEMRSSMin()
 		r.MEMRSSAvg = br.PsCounter.MEMRSSAvg()
 		r.MEMRSSMax = br.PsCounter.MEMRSSMax()
-		r.EchoEER = report.EER(report.RateTPS(r.RecvTimes, r.Duration), r.CPUAvg)
+		tps := report.RateTPS(r.RecvTimes, r.Duration)
+		r.CPUEER = report.CPUEER(tps, r.CPUAvg)
+		r.MEMEER = report.MEMEER(tps, r.MEMRSSAvg)
 	}
 	r.TPS = int64(math.Floor(report.RateTPS(r.RecvTimes, r.Duration)))
 	return r

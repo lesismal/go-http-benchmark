@@ -26,8 +26,9 @@ type Report interface {
 // The orders a report table can be written in, as -sort takes them.
 const (
 	// SortResult puts the best result first: TPS for Connections, and TPS
-	// then EER for BenchEcho and BenchPipeline, whose TPS is the responses the
-	// clients read back off the server per second. The fields tagged rank:"1", rank:"2" and so on are
+	// then CPU EER then MEM EER for BenchEcho and BenchPipeline, whose TPS is
+	// the responses the clients read back off the server per second. The
+	// fields tagged rank:"1", rank:"2" and so on are
 	// what it compares, in that order. Rows that tie on all of them keep the
 	// framework order between them, so a run is reproducible rather than
 	// merely sorted.
@@ -116,7 +117,7 @@ func rankedBefore(a, b []float64) bool {
 // so that only the best shows 100%, and 0% for a table where nothing scored.
 //
 // The best is 100% by comparison rather than by division: for one float in
-// twenty or so, EER among them, value*100/value is 99.99999999999999, which
+// twenty or so, CPU EER among them, value*100/value is 99.99999999999999, which
 // floored left a table with no row at 100%. The same rounding put an exact
 // fraction a hair under its percent - half the best read 49% - so the rest
 // are nudged up by far less than any two results could be told apart by, and
@@ -199,21 +200,33 @@ func SortReports(reports []Report, order string) []Report {
 	return reports
 }
 
-// EER is the throughput a server got for each percent of a CPU core it spent,
-// or 0 when there is nothing to divide by. Both callers go through this rather
-// than dividing for themselves: a server whose CPU samples did not arrive
-// leaves CPUAvg at 0, and the +Inf that came out of that division took the
-// whole row out of the report file with it, since encoding/json refuses to
+// CPUEER is the throughput a server got for each percent of a CPU core it
+// spent, or 0 when there is nothing to divide by. Both callers go through this
+// rather than dividing for themselves: a server whose CPU samples did not
+// arrive leaves CPUAvg at 0, and the +Inf that came out of that division took
+// the whole row out of the report file with it, since encoding/json refuses to
 // marshal Inf and NaN and ToFile's error was dropped.
-func EER(throughput, cpuAvg float64) float64 {
-	if cpuAvg <= 0 || math.IsNaN(cpuAvg) || math.IsInf(throughput, 0) || math.IsNaN(throughput) {
+func CPUEER(throughput, cpuAvg float64) float64 {
+	return eer(throughput, cpuAvg)
+}
+
+// MEMEER is the throughput a server got for each MB (1<<20 bytes, the M the
+// MEM columns are shown in) of memory it held on average, or 0 when there is
+// nothing to divide by, for the same reason as CPUEER.
+func MEMEER(throughput float64, memAvg uint64) float64 {
+	return eer(throughput, float64(memAvg)/(1<<20))
+}
+
+// eer is throughput/cost, or 0 where that is not a finite number.
+func eer(throughput, cost float64) float64 {
+	if cost <= 0 || math.IsNaN(cost) || math.IsInf(throughput, 0) || math.IsNaN(throughput) {
 		return 0
 	}
-	eer := throughput / cpuAvg
-	if math.IsInf(eer, 0) || math.IsNaN(eer) {
+	v := throughput / cost
+	if math.IsInf(v, 0) || math.IsNaN(v) {
 		return 0
 	}
-	return eer
+	return v
 }
 
 func JSON(report Report) string {
