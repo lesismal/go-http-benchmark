@@ -84,3 +84,33 @@ func TestFrameworkListCoversPorts(t *testing.T) {
 		}
 	}
 }
+
+// Every framework's ports - its fifty benchmark ports and the control port
+// after them - fit in a hundred-port block of its own, from 10001 on, so that
+// no two servers share a port and all of them together stay in the one small
+// range a run reserves out of the client's ephemeral ports.
+func TestPortsBlocks(t *testing.T) {
+	const firstPort, blockSize, numPorts = 10001, 100, 50
+	owner := map[int]string{}
+	for _, framework := range FrameworkList {
+		ports, err := GetFrameworkBenchmarkPorts(framework)
+		if err != nil {
+			t.Errorf("%v: %v", framework, err)
+			continue
+		}
+		first, last := ports[0], ports[len(ports)-1]
+		if len(ports) != numPorts || first < firstPort || (first-firstPort)%blockSize != 0 {
+			t.Errorf("%v listens on %v, want %d ports starting a block of %d from %d",
+				framework, Ports[framework], numPorts, blockSize, firstPort)
+			continue
+		}
+		// The control port is last + 1, and has to be in the block too.
+		if block := (first - firstPort) / blockSize; (last+1-firstPort)/blockSize != block {
+			t.Errorf("%v's control port %d is outside its block", framework, last+1)
+		} else if other, taken := owner[block]; taken {
+			t.Errorf("%v and %v share the block from %d", other, framework, first)
+		} else {
+			owner[block] = framework
+		}
+	}
+}

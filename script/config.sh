@@ -164,7 +164,7 @@ if [ -n "${BENCH_FRAMEWORKS:-}" ]; then
     fi
 fi
 
-# The first and last benchmark port of framework $1, "14001 14050", read from
+# The first and last benchmark port of framework $1, "10401 10450", read from
 # config.Ports in config/config.go rather than copied here: first the constant
 # whose value is the name, then that constant's range in the map.
 # TestScriptServerPorts holds this to config.Ports. Here, with
@@ -179,7 +179,7 @@ server_ports() {
 
 # Every port a server listens on, of every framework in config.Ports - its
 # benchmark ports and the control port after them - as the one range
-# "10001-24051" that covers them all.
+# "10001-11451" that covers them all.
 #
 # A single-node run starts each server only for its own turn, after other
 # frameworks' clients have already dialed tens of thousands of connections.

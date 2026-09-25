@@ -39,9 +39,9 @@ use socket2::{Domain, Protocol, Socket, Type};
 use tokio::net::TcpListener;
 
 /// The framework's benchmark ports, which config.Ports in config/config.go
-/// lists as "14001:14050"; config's tests hold the two to each other.
-const FIRST_PORT: u16 = 14001;
-const LAST_PORT: u16 = 14050;
+/// lists as "10401:10450"; config's tests hold the two to each other.
+const FIRST_PORT: u16 = 10401;
+const LAST_PORT: u16 = 10450;
 
 const NAME: &str = "axum";
 

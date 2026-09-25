@@ -7,21 +7,21 @@ use std::net::{IpAddr, ToSocketAddrs};
 /// language and config.Ports' range. config's tests hold this table to the Go
 /// one, line for line.
 pub const FRAMEWORKS: &[(&str, &str, u16, u16)] = &[
-    ("axum", "rust", 14001, 14050),
-    ("beego", "go", 15001, 15050),
-    ("chi", "go", 16001, 16050),
-    ("echo", "go", 17001, 17050),
+    ("axum", "rust", 10401, 10450),
+    ("beego", "go", 10501, 10550),
+    ("chi", "go", 10601, 10650),
+    ("echo", "go", 10701, 10750),
     ("fasthttp", "go", 10001, 10050),
-    ("fib", "go", 11001, 11050),
-    ("fiber", "go", 18001, 18050),
-    ("gin", "go", 12001, 12050),
-    ("goji", "go", 19001, 19050),
-    ("gorillamux", "go", 20001, 20050),
-    ("hertz", "go", 22001, 22050),
-    ("httprouter", "go", 21001, 21050),
-    ("nbio", "go", 24001, 24050),
-    ("nethttp", "go", 13001, 13050),
-    ("workflow", "c++", 23001, 23050),
+    ("fib", "go", 10101, 10150),
+    ("fiber", "go", 10801, 10850),
+    ("gin", "go", 10201, 10250),
+    ("goji", "go", 10901, 10950),
+    ("gorillamux", "go", 11001, 11050),
+    ("hertz", "go", 11201, 11250),
+    ("httprouter", "go", 11101, 11150),
+    ("nbio", "go", 11401, 11450),
+    ("nethttp", "go", 10301, 10350),
+    ("workflow", "c++", 11301, 11350),
 ];
 
 /// config.NoPipeline: the frameworks whose server does not support HTTP/1.1
@@ -215,8 +215,8 @@ mod tests {
     fn addrs() {
         let addrs = benchmark_addrs("nethttp", "::1");
         assert_eq!(addrs.len(), 50);
-        assert_eq!(addrs[0], "[::1]:13001");
-        assert_eq!(control_port("axum"), 14051);
+        assert_eq!(addrs[0], "[::1]:10301");
+        assert_eq!(control_port("axum"), 10451);
         assert_eq!(lang("axum"), "rust");
         assert_eq!(lang("nope"), "-");
         assert!(has_pprof("nethttp"));

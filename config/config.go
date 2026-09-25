@@ -47,30 +47,38 @@ const (
 
 // Ports is the range of benchmark ports each framework's server listens on.
 // Fifty of them, so that a client dialing a million connections from one
-// address does not run out of ephemeral ports towards any one of them. A new
-// framework takes the next thousand after the last range handed out, so that
-// no range moves when one is added.
+// address does not run out of ephemeral ports towards any one of them.
+//
+// Each framework has a block of a hundred ports from 10001 on: its fifty
+// benchmark ports at the start of the block, and its control port right after
+// them (see GetFrameworkControlServerAddr). A new framework takes the next
+// hundred after the last block handed out, so that no range moves when one is
+// added. The blocks are packed together so that every server's ports fit in
+// one small range - 10001-11451 for fifteen frameworks - which a run reserves
+// out of the client's ephemeral ports (server_port_range in script/config.sh),
+// leaving the rest of the port space to the client. TestPortsBlocks holds the
+// map to this layout.
 //
 // axum (Rust) and workflow (C++) cannot import this map, so each carries its
 // range as FIRST_PORT and LAST_PORT in its own source,
 // frameworks/axum/src/main.rs and frameworks/workflow/main.cc, which
 // TestAxumPortsMatch and TestWorkflowPortsMatch hold to the one here.
 var Ports = map[string]string{
-	Axum:       "14001:14050",
-	Beego:      "15001:15050",
-	Chi:        "16001:16050",
-	Echo:       "17001:17050",
+	Axum:       "10401:10450",
+	Beego:      "10501:10550",
+	Chi:        "10601:10650",
+	Echo:       "10701:10750",
 	Fasthttp:   "10001:10050",
-	Fib:        "11001:11050",
-	Fiber:      "18001:18050",
-	Gin:        "12001:12050",
-	Goji:       "19001:19050",
-	GorillaMux: "20001:20050",
-	Hertz:      "22001:22050",
-	HTTPRouter: "21001:21050",
-	NBIO:       "24001:24050",
-	NetHTTP:    "13001:13050",
-	Workflow:   "23001:23050",
+	Fib:        "10101:10150",
+	Fiber:      "10801:10850",
+	Gin:        "10201:10250",
+	Goji:       "10901:10950",
+	GorillaMux: "11001:11050",
+	Hertz:      "11201:11250",
+	HTTPRouter: "11101:11150",
+	NBIO:       "11401:11450",
+	NetHTTP:    "10301:10350",
+	Workflow:   "11301:11350",
 }
 
 // FrameworkList is every framework, in framework-name order. It is also the
@@ -211,7 +219,7 @@ func GetFrameworkControlServerAddr(framework string) (string, error) {
 
 // urlHost brackets a bare IPv6 literal so that it can carry a port in a URL.
 // BENCH_SERVER_HOST may be an address or a hostname, and an IPv6 address
-// without this comes out as http://fe80::1:13001/echo, which parses as neither
+// without this comes out as http://fe80::1:10301/echo, which parses as neither
 // host nor port.
 func urlHost(ip string) string {
 	if strings.Contains(ip, ":") && !strings.HasPrefix(ip, "[") {

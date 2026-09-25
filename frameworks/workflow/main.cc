@@ -54,9 +54,9 @@
 #include <workflow/WFHttpServer.h>
 
 // The framework's benchmark ports, which config.Ports in config/config.go
-// lists as "23001:23050"; config's tests hold the two to each other.
-static const unsigned short FIRST_PORT = 23001;
-static const unsigned short LAST_PORT = 23050;
+// lists as "11301:11350"; config's tests hold the two to each other.
+static const unsigned short FIRST_PORT = 11301;
+static const unsigned short LAST_PORT = 11350;
 
 static const char NAME[] = "workflow";
 

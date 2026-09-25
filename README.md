@@ -290,7 +290,7 @@ needs the port range and file descriptor limits as much as the server does:
 
 ```sh
 sysctl -w net.ipv4.ip_local_port_range="1024 65535"
-sysctl -w net.ipv4.ip_local_reserved_ports=10001-24051
+sysctl -w net.ipv4.ip_local_reserved_ports=10001-11451
 sysctl -w fs.file-max=2000500
 sysctl -w fs.nr_open=2000500
 sysctl -w net.nf_conntrack_max=2000500

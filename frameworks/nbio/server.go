@@ -33,7 +33,7 @@ func main() {
 	engine := nbhttp.NewEngine(nbhttp.Config{
 		Network: "tcp",
 		// A copy: Start writes each listener's resolved address back into
-		// the slice, which would turn ":24001" into "[::]:24001" in the log
+		// the slice, which would turn ":11401" into "[::]:11401" in the log
 		// line below.
 		Addrs: append([]string(nil), addrs...),
 		// Every connection on nbio's poller goroutines, read as its events
