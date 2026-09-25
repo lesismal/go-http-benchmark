@@ -201,8 +201,8 @@ func TestHiddenColumnsStayInTheJSON(t *testing.T) {
 		!strings.Contains(table, "12.50") {
 		t.Errorf("BenchPipeline table:\n%s", table)
 	}
-	if summary := Summary([]Report{echo}, []Report{rate}); !strings.Contains(summary, "| Client           | go ") {
-		t.Errorf("Summary does not show the clients without their prefix:\n%s", summary)
+	if summary := Summary([]Report{echo}, []Report{rate}); !strings.Contains(summary, "| Client           | go-net ") {
+		t.Errorf("Summary does not show the client as <lang>-<framework>:\n%s", summary)
 	}
 
 	for _, v := range []string{`"TP50"`, `"TP75"`, `"TP90"`, `"CPUMin"`, `"MEMMin"`, `"BenchClient":"benchcli-go"`} {
@@ -274,7 +274,7 @@ func TestSummaryTakesTheParametersOutOfTheTables(t *testing.T) {
 		&BenchRateReport{Framework: "fib", BenchClient: "benchcli-go", Duration: 10e9, Connections: 20000, Concurrency: 5000, SendRate: 200, Pipeline: 10, Payload: 1024},
 	}
 	summary := Summary(conns, echo, rate)
-	rows := []string{"Project", "GO-HTTP1-BENCHMARK", "Client", "go", "Conns", "20000 (fib); 19998 (fasthttp)",
+	rows := []string{"Project", "GO-HTTP1-BENCHMARK", "Client", "go-net", "Conns", "20000 (fib); 19998 (fasthttp)",
 		"Payload", "1024", "Dial Concurrency", "2000", "Echo Concurrency", "10000", "Echo Total", "2000000",
 		"Echo Pprof", "true", "Rate Concurrency", "5000", "Rate Duration", "10.00s", "Rate SendRate", "200",
 		"Rate Pipeline", "10", "Rate Pprof", "false"}
@@ -302,7 +302,7 @@ func TestSummaryTakesTheParametersOutOfTheTables(t *testing.T) {
 	if lines[0] != "| Parameter        | Value                         | Description                                                            |" ||
 		lines[1] != "| ---              | ---                           | ---                                                                    |" ||
 		lines[2] != "| Project          | GO-HTTP1-BENCHMARK            | The benchmark this run is from                                         |" ||
-		lines[3] != "| Client           | go                            | The benchmark client the load came from                                |" {
+		lines[3] != "| Client           | go-net                        | The benchmark client the load came from                                |" {
 		t.Errorf("Summary is not left-aligned:\n%s", summary)
 	}
 

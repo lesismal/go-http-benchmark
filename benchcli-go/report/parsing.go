@@ -48,10 +48,21 @@ func tableColumn(field reflect.StructField, enableTPN bool) bool {
 	return enableTPN || field.Tag.Get("tpn") == ""
 }
 
-// clientName is how the Client column shows the client that measured a row:
-// "go". The JSON keeps the full name, "benchcli-go", which is the directory it
-// was built from, so that a second client can sit next to it.
+// clientNames is how the Summary shows each client: its language, then the
+// framework it runs on, "<lang>-<framework>".
+var clientNames = map[string]string{
+	"benchcli-go":   "go-net",
+	"benchcli-rust": "rust-tokio",
+}
+
+// clientName is how the Summary shows the client that measured a row:
+// "go-net". The JSON keeps the full name, "benchcli-go", which is the
+// directory it was built from, so that a second client can sit next to it. A
+// client clientNames does not list reads as its name without "benchcli-".
 func clientName(name string) string {
+	if display, ok := clientNames[name]; ok {
+		return display
+	}
 	return strings.TrimPrefix(name, "benchcli-")
 }
 

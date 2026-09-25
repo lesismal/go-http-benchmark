@@ -111,8 +111,8 @@ response body with the request that was sent.
 
 | `BENCH_CLIENT` | client | Summary `Client` |
 | --- | --- | --- |
-| `benchcli-rust` (default) | [`benchcli-rust`](benchcli-rust): Rust, on [tokio](https://github.com/tokio-rs/tokio), the runtime [axum](https://github.com/tokio-rs/axum) runs on; needs cargo | `rust` |
-| `benchcli-go` | [`benchcli-go`](benchcli-go): Go, goroutines | `go` |
+| `benchcli-rust` (default) | [`benchcli-rust`](benchcli-rust): Rust, on [tokio](https://github.com/tokio-rs/tokio), the runtime [axum](https://github.com/tokio-rs/axum) runs on; needs cargo | `rust-tokio` |
+| `benchcli-go` | [`benchcli-go`](benchcli-go): Go, goroutines on `net` | `go-net` |
 
 ```sh
 BENCH_CLIENT=benchcli-go bash script/benchmark.sh
@@ -304,7 +304,7 @@ They are not a reference measurement: re-run on your own hardware.
 
 | Parameter        | Value   |
 | ---              | ---     |
-| Client           | go      |
+| Client           | go-net  |
 | Conns            | 10000   |
 | Payload          | 1024    |
 | Dial Concurrency | 2000    |

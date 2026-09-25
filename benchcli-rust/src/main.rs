@@ -3,7 +3,7 @@
 //!
 //! It takes the same flags, runs the same three benchmarks the same way, and
 //! writes the same JSON report files, with "benchcli-rust" as their
-//! BenchClient, so the Summary table's Client reads "rust". Turning those
+//! BenchClient, so the Summary table's Client reads "rust-tokio". Turning those
 //! files into the markdown tables is left to the Go client: script/report.sh
 //! runs it on whatever either client wrote, so there is one report format
 //! and one implementation of it.

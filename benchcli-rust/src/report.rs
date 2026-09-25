@@ -209,8 +209,10 @@ pub fn console(kind: &str, rows: &[(&str, String, bool)], enable_tpn: bool) -> S
     out
 }
 
+/// How the Summary shows this client, "<lang>-<framework>": the same name
+/// benchcli-go's report package gives "benchcli-rust".
 pub fn client_name() -> String {
-    BENCH_CLIENT.trim_start_matches("benchcli-").to_string()
+    "rust-tokio".to_string()
 }
 
 pub fn cpu(v: f64) -> String {
