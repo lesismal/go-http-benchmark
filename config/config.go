@@ -40,6 +40,7 @@ const (
 	GorillaMux = "gorillamux"
 	Hertz      = "hertz"
 	HTTPRouter = "httprouter"
+	NBIO       = "nbio"
 	NetHTTP    = "nethttp"
 	Workflow   = "workflow"
 )
@@ -67,6 +68,7 @@ var Ports = map[string]string{
 	GorillaMux: "20001:20050",
 	Hertz:      "22001:22050",
 	HTTPRouter: "21001:21050",
+	NBIO:       "24001:24050",
 	NetHTTP:    "13001:13050",
 	Workflow:   "23001:23050",
 }
@@ -87,6 +89,7 @@ var FrameworkList = []string{
 	GorillaMux,
 	Hertz,
 	HTTPRouter,
+	NBIO,
 	NetHTTP,
 	Workflow,
 }
@@ -107,6 +110,7 @@ var Langs = map[string]string{
 	GorillaMux: "go",
 	Hertz:      "go",
 	HTTPRouter: "go",
+	NBIO:       "go",
 	NetHTTP:    "go",
 	Workflow:   "c++",
 }

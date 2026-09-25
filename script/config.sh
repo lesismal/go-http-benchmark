@@ -108,6 +108,8 @@ SleepTime=5
 #   hertz       github.com/cloudwego/hertz, on its netpoll transport
 #               (github.com/cloudwego/netpoll)
 #   httprouter  github.com/julienschmidt/httprouter, served by net/http
+#   nbio        github.com/lesismal/nbio, its nbhttp server in
+#               IOModNonBlocking, serving nethttp's net/http handler
 #   nethttp     the standard library's net/http
 #   workflow    github.com/sogou/workflow, a C++ server: its HTTP server
 #               benchmark answering with the request body; building it needs
@@ -126,6 +128,7 @@ frameworks=(
     "gorillamux"
     "hertz"
     "httprouter"
+    "nbio"
     "nethttp"
     "workflow"
 )

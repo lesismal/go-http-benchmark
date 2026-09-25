@@ -32,6 +32,7 @@ if [ -z "${BENCH_FRAMEWORKS:-}" ]; then
         "gorillamux"
         "hertz"
         "httprouter"
+        "nbio"
         "nethttp"
         "workflow"
     )

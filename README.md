@@ -19,6 +19,7 @@ the same scripts, the same Go client structure, and the same report format.
 | `gorillamux` | [github.com/gorilla/mux](https://github.com/gorilla/mux) | `mux.NewRouter()` on `net/http` |
 | `hertz` | [github.com/cloudwego/hertz](https://github.com/cloudwego/hertz) | `server.New()` (no middleware) on its [netpoll](https://github.com/cloudwego/netpoll) transport, one engine per port, all sharing netpoll's pollers |
 | `httprouter` | [github.com/julienschmidt/httprouter](https://github.com/julienschmidt/httprouter) | `httprouter.New()` on `net/http` |
+| `nbio` | [github.com/lesismal/nbio](https://github.com/lesismal/nbio) | one `nbhttp.Engine` bound to every port, `IOModNonBlocking` (every connection on nbio's pollers), serving the same `net/http` handler as `nethttp` |
 | `nethttp` | `net/http` | one `http.Server` per port, all sharing one `ServeMux` |
 | `workflow` | [github.com/sogou/workflow](https://github.com/sogou/workflow) (C++) | its HTTP server benchmark, [`benchmark-01-http_server.cc`](https://github.com/sogou/workflow/blob/master/benchmark/benchmark-01-http_server.cc), answering with the request body: one `WFHttpServer` per port, one poller thread per CPU the process may run on, workflow's default 20 handler threads |
 
@@ -151,7 +152,7 @@ for the `axum` server, and git, cmake, a C++ compiler and OpenSSL (on Debian,
 `apt install git cmake g++ libssl-dev`; on macOS, `brew install cmake openssl`)
 for the `workflow` server. Without them, use the Go client and leave axum and
 workflow out:
-`BENCH_CLIENT=benchcli-go BENCH_FRAMEWORKS=beego,chi,echo,fasthttp,fib,fiber,gin,goji,gorillamux,hertz,httprouter,nethttp`. From the
+`BENCH_CLIENT=benchcli-go BENCH_FRAMEWORKS=beego,chi,echo,fasthttp,fib,fiber,gin,goji,gorillamux,hertz,httprouter,nbio,nethttp`. From the
 repository root:
 
 ```sh
