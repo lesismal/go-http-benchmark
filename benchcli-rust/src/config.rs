@@ -20,7 +20,13 @@ pub const FRAMEWORKS: &[(&str, &str, u16, u16)] = &[
     ("hertz", "go", 22001, 22050),
     ("httprouter", "go", 21001, 21050),
     ("nethttp", "go", 13001, 13050),
+    ("workflow", "c++", 23001, 23050),
 ];
+
+/// config.NoPipeline: the frameworks whose server does not support HTTP/1.1
+/// pipelining, which BenchPipeline is skipped for. config's tests hold this
+/// list to the Go one.
+pub const NO_PIPELINE: &[&str] = &["workflow"];
 
 pub const ECHO_PATH: &str = "/echo";
 
@@ -44,6 +50,11 @@ pub fn lang(framework: &str) -> &'static str {
 /// config.HasPprof: only the Go servers serve /debug/pprof/.
 pub fn has_pprof(framework: &str) -> bool {
     lang(framework) == "go"
+}
+
+/// config.SupportsPipeline.
+pub fn supports_pipeline(framework: &str) -> bool {
+    !NO_PIPELINE.contains(&framework)
 }
 
 /// config.GetFrameworkBenchmarkAddrs: host:port for each benchmark port.
@@ -210,6 +221,8 @@ mod tests {
         assert!(has_pprof("nethttp"));
         assert!(!has_pprof("axum"));
         assert!(!has_pprof("nope"));
+        assert!(supports_pipeline("nethttp"));
+        assert!(!supports_pipeline("workflow"));
     }
 
     #[test]

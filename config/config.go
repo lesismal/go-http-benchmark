@@ -41,6 +41,7 @@ const (
 	Hertz      = "hertz"
 	HTTPRouter = "httprouter"
 	NetHTTP    = "nethttp"
+	Workflow   = "workflow"
 )
 
 // Ports is the range of benchmark ports each framework's server listens on.
@@ -49,9 +50,10 @@ const (
 // framework takes the next thousand after the last range handed out, so that
 // no range moves when one is added.
 //
-// axum is a Rust server and cannot import this map, so it carries its range
-// as FIRST_PORT and LAST_PORT in frameworks/axum/src/main.rs, which
-// TestAxumPortsMatch holds to the one here.
+// axum (Rust) and workflow (C++) cannot import this map, so each carries its
+// range as FIRST_PORT and LAST_PORT in its own source,
+// frameworks/axum/src/main.rs and frameworks/workflow/main.cc, which
+// TestAxumPortsMatch and TestWorkflowPortsMatch hold to the one here.
 var Ports = map[string]string{
 	Axum:       "14001:14050",
 	Beego:      "15001:15050",
@@ -66,6 +68,7 @@ var Ports = map[string]string{
 	Hertz:      "22001:22050",
 	HTTPRouter: "21001:21050",
 	NetHTTP:    "13001:13050",
+	Workflow:   "23001:23050",
 }
 
 // FrameworkList is every framework, in framework-name order. It is also the
@@ -85,6 +88,7 @@ var FrameworkList = []string{
 	Hertz,
 	HTTPRouter,
 	NetHTTP,
+	Workflow,
 }
 
 // Langs is the programming language each framework's server is written in,
@@ -104,6 +108,32 @@ var Langs = map[string]string{
 	Hertz:      "go",
 	HTTPRouter: "go",
 	NetHTTP:    "go",
+	Workflow:   "c++",
+}
+
+// NoPipeline lists the frameworks whose server does not support HTTP/1.1
+// pipelining, so that BenchPipeline would measure connections being closed
+// rather than requests being answered. workflow's closes a connection that
+// sends a request before the one in front of it is answered
+// (Communicator::create_request fails with EBADMSG). The clients skip
+// BenchPipeline for these and write a report marked Skipped instead, which
+// the BenchPipeline table shows as a row of "-".
+//
+// benchcli-rust carries the same list as NO_PIPELINE in its config.rs, which
+// TestRustClientNoPipelineMatches holds to this one.
+var NoPipeline = []string{
+	Workflow,
+}
+
+// SupportsPipeline reports whether framework's server answers pipelined
+// requests, which BenchPipeline needs.
+func SupportsPipeline(framework string) bool {
+	for _, v := range NoPipeline {
+		if v == framework {
+			return false
+		}
+	}
+	return true
 }
 
 // FrameworkLang is framework's language, or "-" for a framework Langs does

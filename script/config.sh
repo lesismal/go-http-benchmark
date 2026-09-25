@@ -109,6 +109,10 @@ SleepTime=5
 #               (github.com/cloudwego/netpoll)
 #   httprouter  github.com/julienschmidt/httprouter, served by net/http
 #   nethttp     the standard library's net/http
+#   workflow    github.com/sogou/workflow, a C++ server: its HTTP server
+#               benchmark answering with the request body; building it needs
+#               git, cmake, a C++ compiler and OpenSSL (see
+#               frameworks/workflow/build.sh)
 frameworks=(
     "axum"
     "beego"
@@ -123,6 +127,7 @@ frameworks=(
     "hertz"
     "httprouter"
     "nethttp"
+    "workflow"
 )
 
 # Optional comma-separated subset, used by the Docker smoke test and useful for

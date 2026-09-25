@@ -4,6 +4,7 @@ import (
 	"os"
 	"regexp"
 	"strconv"
+	"strings"
 	"testing"
 )
 
@@ -33,5 +34,26 @@ func TestRustClientFrameworksMatch(t *testing.T) {
 		if first != strconv.Itoa(ports[0]) || last != strconv.Itoa(ports[len(ports)-1]) {
 			t.Errorf("%v: ports %v:%v, Ports has %v", name, first, last, Ports[name])
 		}
+	}
+}
+
+// benchcli-rust skips BenchPipeline for the frameworks in its NO_PIPELINE,
+// which has to be NoPipeline, or the two clients disagree on which rows of
+// the table are measured.
+func TestRustClientNoPipelineMatches(t *testing.T) {
+	src, err := os.ReadFile("../benchcli-rust/src/config.rs")
+	if err != nil {
+		t.Fatal(err)
+	}
+	list := regexp.MustCompile(`(?s)pub const NO_PIPELINE: &\[&str\] = &\[(.*?)\];`).FindSubmatch(src)
+	if list == nil {
+		t.Fatal("no NO_PIPELINE in benchcli-rust/src/config.rs")
+	}
+	var got []string
+	for _, m := range regexp.MustCompile(`"([a-z0-9_]+)"`).FindAllSubmatch(list[1], -1) {
+		got = append(got, string(m[1]))
+	}
+	if strings.Join(got, ",") != strings.Join(NoPipeline, ",") {
+		t.Errorf("benchcli-rust/src/config.rs NO_PIPELINE is %v, NoPipeline is %v", got, NoPipeline)
 	}
 }

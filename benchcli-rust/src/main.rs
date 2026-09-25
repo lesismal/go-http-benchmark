@@ -321,7 +321,25 @@ async fn run(f: flags::Flags) {
     print("\n");
     print(SHORT_LINE);
 
-    if f.rate_enabled {
+    if f.rate_enabled && !config::supports_pipeline(&fw) {
+        logf!("{fw}: BenchPipeline skipped: {fw}'s server does not support HTTP pipelining");
+        let r = BenchRateReport {
+            framework: fw.clone(),
+            lang: lang.clone(),
+            bench_client: report::BENCH_CLIENT.into(),
+            skipped: true,
+            ..Default::default()
+        };
+        report::to_file(
+            &r,
+            &format!("{fw}-BenchPipeline"),
+            "BenchPipeline",
+            &f.preffix,
+            &f.suffix,
+            None,
+        );
+        print(SHORT_LINE);
+    } else if f.rate_enabled {
         let rate_pprof: Pprof = Arc::default();
         let duration = Duration::from_secs(if f.rate_duration == 0 {
             10
@@ -381,6 +399,7 @@ async fn run(f: flags::Flags) {
             mem_min: res.mem_min,
             mem_avg: res.mem_avg,
             mem_max: res.mem_max,
+            skipped: false,
         };
         let pprof = rate_pprof.lock().unwrap().take();
         report::to_file(

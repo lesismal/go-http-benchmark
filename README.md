@@ -1,7 +1,7 @@
 # go-http-benchmark
 
-HTTP/1.1 server benchmark for Go frameworks, with Rust's axum as a
-reference, built the same way as
+HTTP/1.1 server benchmark for Go frameworks, with Rust's axum and C++'s
+workflow as references, built the same way as
 [go-websocket-benchmark](https://github.com/lesismal/go-websocket-benchmark):
 the same scripts, the same Go client structure, and the same report format.
 
@@ -20,6 +20,7 @@ the same scripts, the same Go client structure, and the same report format.
 | `hertz` | [github.com/cloudwego/hertz](https://github.com/cloudwego/hertz) | `server.New()` (no middleware) on its [netpoll](https://github.com/cloudwego/netpoll) transport, one engine per port, all sharing netpoll's pollers |
 | `httprouter` | [github.com/julienschmidt/httprouter](https://github.com/julienschmidt/httprouter) | `httprouter.New()` on `net/http` |
 | `nethttp` | `net/http` | one `http.Server` per port, all sharing one `ServeMux` |
+| `workflow` | [github.com/sogou/workflow](https://github.com/sogou/workflow) (C++) | its HTTP server benchmark, [`benchmark-01-http_server.cc`](https://github.com/sogou/workflow/blob/master/benchmark/benchmark-01-http_server.cc), answering with the request body: one `WFHttpServer` per port, one poller thread per CPU the process may run on, workflow's default 20 handler threads |
 
 The servers built on `net/http` each run one `http.Server` per port, all on
 the framework's one router, and read the request body into a pooled buffer
@@ -44,6 +45,27 @@ clients fetch pprof profiles only from Go servers, so an axum run has none. It
 takes the same `-nodelay`, `-reuseport` and `-b` flags; `-m` is accepted and
 ignored, since Rust has no GC to limit. Its port range is a constant in
 `src/main.rs`, which a test in `config` holds to `config.Ports`.
+
+`workflow` is a C++ program in [`frameworks/workflow`](frameworks/workflow),
+and is set up the same way as axum: it serves `/init` and `/ps` itself on its
+control port, has no `/debug/pprof/`, takes the same flags with `-m` ignored,
+and carries its port range as a constant in `main.cc` that a test holds to
+`config.Ports`. The server is workflow's own benchmark server with one
+change: it answers with the request body rather than a fixed string, since
+the clients check the body. It also lifts three of workflow's per-server
+defaults that a Go server does not have, so that they do not decide a run:
+the 2000-connection limit, the 10s write timeout, and the 60s idle keep-alive
+timeout, which goes to workflow's maximum of 300s. [`build.sh`](frameworks/workflow/build.sh)
+builds workflow v1.1.0 from source, as a static library, and needs git,
+cmake, a C++ compiler and OpenSSL's headers.
+
+workflow's server does not support HTTP pipelining: data arriving on a
+connection before the server has answered the request in front of it closes
+the connection (`Communicator::create_request` fails with `EBADMSG`). So both
+clients skip `BenchPipeline` for it (`config.NoPipeline`) and write a report
+marked `Skipped` instead. Its row stays in the `BenchPipeline` table, with
+`-` in every column but `Framework` and `Lang`, after every measured row, and
+takes no part in the Summary.
 
 ## What is measured
 
@@ -123,9 +145,12 @@ CPU, MEM and EER columns read 0. The client logs a message when that happens.
 
 ## Run
 
-Go 1.27 or later, and a Rust toolchain (cargo 1.85 or later; see
+Go 1.27 or later, a Rust toolchain (cargo 1.85 or later; see
 [rustup.rs](https://rustup.rs)) for the default client, `benchcli-rust`, and
-for the `axum` server. Without cargo, use the Go client and leave axum out:
+for the `axum` server, and git, cmake, a C++ compiler and OpenSSL (on Debian,
+`apt install git cmake g++ libssl-dev`; on macOS, `brew install cmake openssl`)
+for the `workflow` server. Without them, use the Go client and leave axum and
+workflow out:
 `BENCH_CLIENT=benchcli-go BENCH_FRAMEWORKS=beego,chi,echo,fasthttp,fib,fiber,gin,goji,gorillamux,hertz,httprouter,nethttp`. From the
 repository root:
 
@@ -178,10 +203,11 @@ bash script/docker_benchmark.sh -c=10000 -en=2000000 -b=1024
 Run `bash script/docker_benchmark.sh --help` for all overrides. From mainland
 China, use `script/docker_benchmark_cn.sh` instead. It takes the same options
 and builds the image from mirrors (DaoCloud for Docker Hub, Aliyun for apt,
-goproxy.cn for Go modules, rsproxy.cn for crates.io). Only the build downloads
-anything, and the benchmark itself runs with `--network none`: the image
-carries the Rust toolchain and has axum's dependencies compiled, so building
-axum in the container needs no network.
+goproxy.cn for Go modules, rsproxy.cn for crates.io, Gitee for workflow).
+Only the build downloads anything, and the benchmark itself runs with
+`--network none`: the image carries the Rust toolchain and has axum's
+dependencies and the workflow library compiled, so building axum and workflow
+in the container needs no network.
 
 The [Docker benchmark workflow](.github/workflows/docker-benchmark.yml) runs
 the same script on every push to `main`, or by hand from the Actions tab, and
@@ -199,7 +225,7 @@ flag that sets it, then one table per benchmark. The Summary's first row,
 `Project`, names the benchmark: `GO-HTTP1-BENCHMARK`.
 
 - `Lang`, right after `Framework`, is the language the framework's server is
-  written in (`go`, `rust`), from `config.Langs`.
+  written in (`go`, `rust`, `c++`), from `config.Langs`.
 - Rows are ranked best first by `TPS`. In `BenchEcho` and `BenchPipeline`, a tie
   is broken by `EER`. The ranked columns carry `[↓1]` and `[↓2]` in their
   titles.

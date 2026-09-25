@@ -161,6 +161,22 @@ func withPercent(rows [][]string, col int, values []float64) {
 	}
 }
 
+// skippable is a report that can stand for a benchmark a framework was not
+// run in, rather than for a result: a BenchRateReport marked Skipped.
+type skippable interface {
+	IsSkipped() bool
+}
+
+// isSkipped reports whether r stands for a benchmark that was not run.
+func isSkipped(r Report) bool {
+	s, ok := r.(skippable)
+	return ok && s.IsSkipped()
+}
+
+// skippedCell is what every column of a skipped report's row shows but its
+// framework and language.
+const skippedCell = "-"
+
 // SortReports orders reports in place and returns them.
 //
 // ReadReports builds the slice in config.FrameworkList order, so SortFramework
@@ -171,7 +187,12 @@ func withPercent(rows [][]string, col int, values []float64) {
 // is left alone; ValidateSort is where a caller catches that.
 func SortReports(reports []Report, order string) []Report {
 	if order == SortResult {
+		// A skipped report has nothing to rank by, so it goes after every
+		// measured one, however little that one scored.
 		sort.SliceStable(reports, func(i, j int) bool {
+			if si, sj := isSkipped(reports[i]), isSkipped(reports[j]); si != sj {
+				return sj
+			}
 			return rankedBefore(RankKeys(reports[i]), RankKeys(reports[j]))
 		})
 	}
@@ -228,6 +249,18 @@ func Markdown(reports []Report, enableTPN bool, order string, filter func(string
 				}
 				withPercent(rows, col, values)
 				break
+			}
+		}
+	}
+	// Written over the row withPercent gave it, whose zeros would read as a
+	// result.
+	for i, v := range reports {
+		if !isSkipped(v) {
+			continue
+		}
+		for col, header := range headers {
+			if header != "Framework" && header != "Lang" {
+				rows[i][col] = skippedCell
 			}
 		}
 	}

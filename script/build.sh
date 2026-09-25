@@ -15,6 +15,7 @@ build_benchmark() {
             echo "build ${f} ..."
             case "${f}" in
                 axum) bash ./frameworks/axum/build.sh "$(pwd)/output/bin/${f}.server" || return 1 ;;
+                workflow) bash ./frameworks/workflow/build.sh "$(pwd)/output/bin/${f}.server" || return 1 ;;
                 *) go build -o "./output/bin/${f}.server" "./frameworks/${f}" || return 1 ;;
             esac
             echo "build ${f} done"

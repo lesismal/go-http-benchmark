@@ -16,6 +16,12 @@ var (
 // under that load is its result, the way TPS is in the other two. Rows with
 // the same TPS are ranked by EER (rank:"2"), the one that spent less CPU on it
 // first.
+//
+// Skipped marks a framework BenchPipeline was not run against, because its
+// server does not support pipelining (config.NoPipeline). Such a report
+// carries only Framework, Lang and BenchClient; its row is kept in the table,
+// with "-" in every other column, and ranked after every measured one, and it
+// takes no part in the Summary.
 type BenchRateReport struct {
 	Framework    string  `json:"Framework" md:"Framework"`
 	Lang         string  `json:"Lang" md:"Lang"`
@@ -39,6 +45,7 @@ type BenchRateReport struct {
 	MEMRSSMin    uint64  `json:"MEMMin" md:"-" fmt:"mem"`
 	MEMRSSAvg    uint64  `json:"MEMAvg" md:"MEM Avg" fmt:"mem"`
 	MEMRSSMax    uint64  `json:"MEMMax" md:"MEM Max" fmt:"mem"`
+	Skipped      bool    `json:"Skipped" md:"-" fmt:"-"`
 	pprofDataCPU []byte  `json:"-" md:"-" fmt:"-"`
 	pprofDataMEM []byte  `json:"-" md:"-" fmt:"-"`
 }
@@ -54,6 +61,11 @@ func (r *BenchRateReport) Type() string {
 
 func (r *BenchRateReport) Name() string {
 	return fmt.Sprintf("%s-%s", r.Framework, BenchPipelineName)
+}
+
+// IsSkipped reports whether the benchmark was skipped for r's framework.
+func (r *BenchRateReport) IsSkipped() bool {
+	return r.Skipped
 }
 
 func (r *BenchRateReport) Headers() []string {

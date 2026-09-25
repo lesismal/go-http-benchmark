@@ -194,7 +194,17 @@ func main() {
 	logging.Print("\n")
 	logging.Print(logging.ShortLine)
 
-	if *rateEnabled {
+	if *rateEnabled && !config.SupportsPipeline(*framework) {
+		logging.Printf("%v: %v skipped: %v's server does not support HTTP pipelining",
+			*framework, report.BenchPipelineName, *framework)
+		saveReport(&report.BenchRateReport{
+			Framework:   *framework,
+			Lang:        config.FrameworkLang(*framework),
+			BenchClient: "benchcli-go",
+			Skipped:     true,
+		})
+		logging.Print(logging.ShortLine)
+	} else if *rateEnabled {
 		br := benchrate.New(*framework, serverPid, *ip, cs.Conns(), *checkValid)
 		br.PsSource = psSetup.Source
 		br.Concurrency = *rateConcurrency

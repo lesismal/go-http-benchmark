@@ -35,7 +35,10 @@ Environment overrides:
   DOCKER_BENCH_GOPROXY     GOPROXY for the image's go mod download
   DOCKER_BENCH_CARGO_MIRROR Sparse registry replacing crates.io for the image's
                            cargo build, e.g. sparse+https://rsproxy.cn/index/
-  (script/docker_benchmark_cn.sh sets the last five to mainland China mirrors.)
+  DOCKER_BENCH_WORKFLOW_REPO Git repository the workflow server's library is
+                           cloned from (default: GitHub), e.g.
+                           https://gitee.com/sogou/workflow.git
+  (script/docker_benchmark_cn.sh sets the last six to mainland China mirrors.)
 
 Examples:
   bash script/docker_benchmark.sh --smoke
@@ -91,6 +94,7 @@ if [ -n "${DOCKER_BENCH_APT_MIRROR:-}" ]; then build_args+=(--build-arg "APT_MIR
 if [ -n "${DOCKER_BENCH_GOPROXY:-}" ]; then build_args+=(--build-arg "GO_PROXY=$DOCKER_BENCH_GOPROXY"); fi
 if [ -n "${DOCKER_BENCH_RUST_IMAGE:-}" ]; then build_args+=(--build-arg "RUST_IMAGE=$DOCKER_BENCH_RUST_IMAGE"); fi
 if [ -n "${DOCKER_BENCH_CARGO_MIRROR:-}" ]; then build_args+=(--build-arg "CARGO_MIRROR=$DOCKER_BENCH_CARGO_MIRROR"); fi
+if [ -n "${DOCKER_BENCH_WORKFLOW_REPO:-}" ]; then build_args+=(--build-arg "WORKFLOW_REPO=$DOCKER_BENCH_WORKFLOW_REPO"); fi
 if [ "${DOCKER_BENCH_SKIP_BUILD:-0}" != 1 ]; then
     echo "Building Docker benchmark image: $image"
     docker build "${build_args[@]}" .

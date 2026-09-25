@@ -47,6 +47,21 @@ func TestHasPprof(t *testing.T) {
 	}
 }
 
+// Only workflow's server closes pipelined connections; every other one is
+// measured in BenchPipeline.
+func TestSupportsPipeline(t *testing.T) {
+	for _, framework := range FrameworkList {
+		if got, want := SupportsPipeline(framework), framework != Workflow; got != want {
+			t.Errorf("SupportsPipeline(%v) = %v, want %v", framework, got, want)
+		}
+	}
+	for _, framework := range NoPipeline {
+		if _, ok := Ports[framework]; !ok {
+			t.Errorf("NoPipeline lists %v, which is not a framework", framework)
+		}
+	}
+}
+
 // A framework with no ports is one the clients cannot reach, and a port range
 // with no framework is one nothing runs on: the two lists have to carry the
 // same names.

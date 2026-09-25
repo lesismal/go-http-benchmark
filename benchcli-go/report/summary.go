@@ -55,6 +55,11 @@ func Summary(tables ...[]Report) string {
 	var names []string
 	for _, reports := range tables {
 		for _, r := range reports {
+			// Its parameters were never used, so they would only disagree
+			// with the ones that were.
+			if isSkipped(r) {
+				continue
+			}
 			value := reflect.Indirect(reflect.ValueOf(r))
 			typ := value.Type()
 			framework := value.FieldByName("Framework").String()

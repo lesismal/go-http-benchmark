@@ -4,3 +4,4 @@ output/
 bin/
 frameworks/axum/target/
 benchcli-rust/target/
+frameworks/workflow/target/

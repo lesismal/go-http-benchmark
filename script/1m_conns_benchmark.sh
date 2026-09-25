@@ -33,6 +33,7 @@ if [ -z "${BENCH_FRAMEWORKS:-}" ]; then
         "hertz"
         "httprouter"
         "nethttp"
+        "workflow"
     )
 fi
 

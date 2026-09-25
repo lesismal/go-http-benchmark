@@ -550,3 +550,57 @@ func TestLangIsTheSecondColumn(t *testing.T) {
 		t.Errorf("an old axum report read back as %+v, want Lang rust", reports)
 	}
 }
+
+// TestSkippedPipelineRowIsDashes keeps a framework BenchPipeline was skipped
+// for in its table, as a row of "-" after its name and language: last when
+// ranked, even below a measured row that scored nothing, and in its place in
+// framework order. It takes no part in the Summary.
+func TestSkippedPipelineRowIsDashes(t *testing.T) {
+	Init(false)
+	reports := func() []Report {
+		return []Report{
+			&BenchRateReport{Framework: "a", Lang: "go", BenchClient: "benchcli-go", Duration: 1e9, TPS: 0},
+			&BenchRateReport{Framework: "b", Lang: "c++", BenchClient: "benchcli-go", Skipped: true},
+			&BenchRateReport{Framework: "c", Lang: "go", BenchClient: "benchcli-go", Duration: 1e9, TPS: 10, EchoEER: 1},
+		}
+	}
+	if got := names(SortReports(reports(), SortResult)); !equal(got, []string{"c", "a", "b"}) {
+		t.Errorf("ranked %v, want the skipped row last: [c a b]", got)
+	}
+	if got := names(SortReports(reports(), SortFramework)); !equal(got, []string{"a", "b", "c"}) {
+		t.Errorf("framework order %v, want [a b c]", got)
+	}
+
+	table := Markdown(reports(), false, SortResult, nil)
+	var row []string
+	for _, line := range strings.Split(table, "\n") {
+		cells := strings.Split(line, "|")
+		if len(cells) > 2 && strings.TrimSpace(cells[1]) == "b" {
+			for _, cell := range cells[1 : len(cells)-1] {
+				row = append(row, strings.TrimSpace(cell))
+			}
+		}
+	}
+	if len(row) != len(BenchRateReportMarkdownHeaders) {
+		t.Fatalf("no full row for b in:\n%s", table)
+	}
+	for i, cell := range row {
+		want := skippedCell
+		switch i {
+		case 0:
+			want = "b"
+		case 1:
+			want = "c++"
+		}
+		if cell != want {
+			t.Errorf("b's %v reads %q, want %q:\n%s", BenchRateReportMarkdownHeaders[i], cell, want, table)
+		}
+	}
+
+	// A disagreement would list each value with its frameworks, as in
+	// "1.00s (a, c); 0s (b)".
+	summary := Summary(reports())
+	if strings.Contains(summary, "; ") || strings.Contains(summary, "(b)") {
+		t.Errorf("the skipped row put its zeros into the Summary:\n%s", summary)
+	}
+}

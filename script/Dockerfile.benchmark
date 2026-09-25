@@ -16,9 +16,12 @@ FROM ${GO_IMAGE}
 #   GO_PROXY       GOPROXY for go mod download, e.g. https://goproxy.cn
 #   CARGO_MIRROR   a sparse registry replacing crates.io for cargo, e.g.
 #                  sparse+https://rsproxy.cn/index/
+#   WORKFLOW_REPO  the git repository the workflow server's library is cloned
+#                  from, e.g. https://gitee.com/sogou/workflow.git
 ARG APT_MIRROR=
 ARG GO_PROXY=
 ARG CARGO_MIRROR=
+ARG WORKFLOW_REPO=
 
 COPY --from=rust /usr/local/rustup /usr/local/rustup
 COPY --from=rust /usr/local/cargo /usr/local/cargo
@@ -27,7 +30,9 @@ ENV RUSTUP_HOME=/usr/local/rustup \
     PATH=/usr/local/cargo/bin:$PATH
 
 # procps, psmisc and util-linux for pkill/killall and taskset, which the
-# scripts stop the servers and pin them to their CPUs with.
+# scripts stop the servers and pin them to their CPUs with. cmake, g++ and
+# libssl-dev for the workflow server, a C++ program on a library that links
+# OpenSSL even for plain HTTP; the Go image already has git.
 RUN if [ -n "$APT_MIRROR" ]; then \
         for f in /etc/apt/sources.list.d/debian.sources /etc/apt/sources.list; do \
             if [ -f "$f" ]; then \
@@ -38,6 +43,9 @@ RUN if [ -n "$APT_MIRROR" ]; then \
     && apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
         ca-certificates \
+        cmake \
+        g++ \
+        libssl-dev \
         procps \
         psmisc \
         util-linux \
@@ -70,6 +78,16 @@ RUN if [ -n "$CARGO_MIRROR" ]; then \
     fi \
     && cargo build --release --locked --manifest-path frameworks/axum/Cargo.toml \
     && cargo build --release --locked --manifest-path benchcli-rust/Cargo.toml
+
+# The workflow server's library, cloned at the release frameworks/workflow/
+# build.sh pins and built the same way, into a directory outside the
+# workspace that the script reuses, so that script/build.sh builds the server
+# in the container with no network.
+ENV WORKFLOW_BUILD_DIR=/tmp/workflow-build
+COPY frameworks/workflow /workspace/frameworks/workflow
+RUN if [ -n "$WORKFLOW_REPO" ]; then export WORKFLOW_REPO; else unset WORKFLOW_REPO; fi \
+    && bash frameworks/workflow/build.sh /tmp/workflow.server \
+    && rm /tmp/workflow.server
 
 COPY . .
 

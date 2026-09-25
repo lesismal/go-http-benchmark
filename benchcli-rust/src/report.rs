@@ -152,6 +152,10 @@ pub struct BenchRateReport {
     pub mem_avg: u64,
     #[serde(rename = "MEMMax")]
     pub mem_max: u64,
+    /// report.BenchRateReport's Skipped: BenchPipeline was not run, because
+    /// the framework's server does not support pipelining.
+    #[serde(rename = "Skipped")]
+    pub skipped: bool,
 }
 
 /// report.Filename.
