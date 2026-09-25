@@ -591,7 +591,7 @@ pub async fn pipeline(
             ticker.set_missed_tick_behavior(tokio::time::MissedTickBehavior::Skip);
             loop {
                 tokio::select! {
-                    _ = tokio::time::sleep_until(deadline) => return,
+                    _ = tokio::time::sleep_until(deadline) => return team,
                     _ = ticker.tick() => {}
                 }
                 for (wh, flight) in team.iter_mut() {
@@ -616,8 +616,17 @@ pub async fn pipeline(
             }
         }));
     }
+    // The write halves are kept, not dropped, until the last batch has had
+    // its tick to come back: dropping a tokio OwnedWriteHalf shuts the
+    // connection down for writing, and a server that reads the batch and the
+    // FIN together may close the connection without answering the requests it
+    // has read but not yet served - nbio does - which would count against it
+    // responses it was never given the time to send.
+    let mut write_halves = Vec::with_capacity(tasks.len());
     for t in tasks {
-        let _ = t.await;
+        if let Ok(team) = t.await {
+            write_halves.push(team);
+        }
     }
 
     // One tick more for the last batch to come back, and no longer.
@@ -638,6 +647,7 @@ pub async fn pipeline(
     for r in readers {
         r.abort();
     }
+    drop(write_halves);
     logf!(
         "BenchPipeline for {:.2} seconds done",
         cfg.duration.as_secs_f64()
