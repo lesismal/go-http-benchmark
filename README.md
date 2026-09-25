@@ -179,6 +179,13 @@ are in `output/log`. `benchmark.sh` forwards only `-nodelay`, `-reuseport`,
 `-b` and `-m` to the servers. Every other flag goes to the client; run
 `go run ./benchcli-go -h` for the list.
 
+Only one server runs at a time. Each framework's server is started right
+before its turn. Its client starts one second after the server listens on all
+of its ports. The server is stopped as soon as the client is done, and the
+next framework waits for it to exit. The run then pauses for `SleepTime`
+seconds (in `script/config.sh`) before the next framework, but not after the
+last one.
+
 On Linux, `script/env.sh` pins the servers and the client to separate halves
 of the CPUs with `taskset`, and splits by socket, NUMA node or core when
 `lscpu` can tell them apart. Without `taskset` (macOS, for example), nothing is
@@ -283,6 +290,7 @@ needs the port range and file descriptor limits as much as the server does:
 
 ```sh
 sysctl -w net.ipv4.ip_local_port_range="1024 65535"
+sysctl -w net.ipv4.ip_local_reserved_ports=10001-24051
 sysctl -w fs.file-max=2000500
 sysctl -w fs.nr_open=2000500
 sysctl -w net.nf_conntrack_max=2000500
@@ -297,6 +305,13 @@ sysctl -w net.ipv4.tcp_max_syn_backlog=2048
 sysctl -w /proc/sys/net/core/netdev_max_backlog=2048
 sysctl -w net.ipv4.tcp_tw_reuse=1
 ```
+
+`ip_local_reserved_ports` keeps the servers' ports, every framework's range in
+`config.Ports` plus its control port, out of the client's ephemeral ports.
+Each server starts only for its own turn. Without the reservation, the
+connections of earlier runs, and the TIME_WAIT sockets they leave behind, can
+hold a later server's ports, and it exits with "address already in use".
+`docker_benchmark.sh` sets both port settings in the container itself.
 
 ## Sample results
 

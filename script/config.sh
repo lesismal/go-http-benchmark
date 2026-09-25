@@ -35,7 +35,8 @@ BENCH_SERVER_HOST=${BENCH_SERVER_HOST:-127.0.0.1}
 #
 # Two things differ from a single-node run. The client cannot stop a server it
 # did not start, so every framework's server stays up for the whole run rather
-# than being killed after its turn: stop them on the server node afterwards
+# than being started right before its turn and stopped right after it, as on
+# one node: stop them on the server node afterwards
 # with script/killall.sh, and use BENCH_FRAMEWORKS below if the idle ones
 # holding memory would disturb the framework being measured. And each node
 # gives the whole machine to its own half, since there is no longer anything
@@ -87,6 +88,9 @@ esac
 Connections=(5000 50000)
 BodySize=(512 1024)
 BenchTime=(2000000)
+# Seconds between two runs, once the last one's server has exited: none after
+# the last run. A server is up when it listens on all its ports, and its client
+# starts one second after that.
 SleepTime=5
 
 # Which frameworks a run measures, and the order the servers are started and
@@ -159,3 +163,34 @@ if [ -n "${BENCH_FRAMEWORKS:-}" ]; then
         return 1
     fi
 fi
+
+# The first and last benchmark port of framework $1, "14001 14050", read from
+# config.Ports in config/config.go rather than copied here: first the constant
+# whose value is the name, then that constant's range in the map.
+# TestScriptServerPorts holds this to config.Ports. Here, with
+# server_port_range below, rather than in env.sh: docker_benchmark.sh reads
+# only this file.
+server_ports() {
+    local name
+    name=$(sed -n "s/^[[:space:]]*\([A-Za-z0-9_]*\)[[:space:]]*=[[:space:]]*\"$1\"[[:space:]]*\$/\1/p" ./config/config.go | head -n 1)
+    [ -n "$name" ] || return 1
+    sed -n "s/^[[:space:]]*${name}:[[:space:]]*\"\([0-9]*\):\([0-9]*\)\",\{0,1\}[[:space:]]*\$/\1 \2/p" ./config/config.go | head -n 1
+}
+
+# Every port a server listens on, of every framework in config.Ports - its
+# benchmark ports and the control port after them - as the one range
+# "10001-24051" that covers them all.
+#
+# A single-node run starts each server only for its own turn, after other
+# frameworks' clients have already dialed tens of thousands of connections.
+# With an ephemeral port range that takes these in, as the "1024 65535" the
+# README and docker_benchmark.sh set does, those connections' local ports -
+# and the TIME_WAIT sockets they leave for a minute after them - sit on ports
+# a later server needs, and it exits with "address already in use". Reserving
+# the range, with net.ipv4.ip_local_reserved_ports, keeps the kernel from
+# handing them out as ephemeral ports.
+server_port_range() {
+    sed -n '/^var Ports = map/,/^}/p' ./config/config.go |
+        sed -n 's/^[[:space:]]*[A-Za-z0-9_]*:[[:space:]]*"\([0-9]*\):\([0-9]*\)",\{0,1\}[[:space:]]*$/\1 \2/p' |
+        awk 'NR == 1 || $1 < min { min = $1 } NR == 1 || $2 > max { max = $2 } END { if (NR) print min "-" max + 1 }'
+}

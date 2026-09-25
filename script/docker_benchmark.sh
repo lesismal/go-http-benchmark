@@ -198,6 +198,14 @@ cleanup_container() {
 }
 trap cleanup_container EXIT INT TERM
 
+# Kept out of the client's ephemeral ports, or a server started after other
+# frameworks' runs finds its ports taken; see server_port_range in
+# script/config.sh.
+if ! server_port_range=$(server_port_range) || [ -z "$server_port_range" ]; then
+    echo "no server ports in config.Ports in config/config.go" >&2
+    exit 1
+fi
+
 run_args=(
     --name "$container"
     --init
@@ -209,6 +217,7 @@ run_args=(
     --pids-limit 32768
     --ulimit nofile=1048576:1048576
     --sysctl "net.ipv4.ip_local_port_range=1024 65535"
+    --sysctl "net.ipv4.ip_local_reserved_ports=$server_port_range"
     --sysctl net.ipv4.tcp_tw_reuse=1
     --env "BENCH_SERVER_CPU_LIST=$server_cpu_list"
     --env "BENCH_CLIENT_CPU_LIST=$client_cpu_list"

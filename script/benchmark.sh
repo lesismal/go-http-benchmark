@@ -32,7 +32,9 @@ for arg in "$@"; do
     esac
 done
 
-if bench_runs_servers; then
+# A server node starts every server now and leaves them up for the client
+# node. On a single node, clients.sh starts each one for its own turn only.
+if bench_runs_servers && ! bench_owns_servers; then
     . ./script/servers.sh
 
     echo $line
@@ -45,8 +47,6 @@ if ! bench_runs_clients; then
     echo $line
     return 0 2>/dev/null || exit 0
 fi
-
-sleep 3
 
 . ./script/clients.sh -rate=true "$@" || { return 1 2>/dev/null || exit 1; }
 

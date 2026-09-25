@@ -13,7 +13,10 @@ if [ -z "${server_flags+set}" ]; then
     server_flags="$*"
 fi
 
-# start all servers together, else it would hard to bind addr and start failed after some benchmark
+# Every server at once, for a server node (BENCH_ROLE=server): the client
+# node cannot start or stop them, so they all stay up for the whole run. A
+# single-node run starts each one for its own turn instead; see start_server
+# in script/env.sh.
 for f in ${frameworks[@]}; do
     echo
     ./script/server.sh $f $server_flags
