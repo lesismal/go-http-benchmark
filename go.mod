@@ -11,7 +11,7 @@ require (
 	github.com/gorilla/mux v1.8.1
 	github.com/julienschmidt/httprouter v1.3.0
 	github.com/labstack/echo/v5 v5.3.1
-	github.com/lesismal/fib v0.0.0-20260925092542-eae6e91e573b
+	github.com/lesismal/fib v0.0.0-20260926064024-9dec8fc9752b
 	github.com/lesismal/nbio v1.7.0
 	github.com/lesismal/perf v0.0.0-20240508164715-fdb92a70ac1c
 	github.com/libp2p/go-reuseport v0.4.0

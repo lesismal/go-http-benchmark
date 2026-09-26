@@ -74,20 +74,23 @@ func onRequest(c *fibhttp.Context, r *stdhttp.Request) {
 	_ = c.Respond(stdhttp.StatusOK, "application/octet-stream", body)
 }
 
-// serverHandler sets TCP_NODELAY on each connection before fib's HTTP handler
-// sees it: fib hands the descriptor to its poller as it was accepted, and Go's
-// net package, which sets the option for the other three, is not involved.
+// serverHandler sets TCP_NODELAY to -nodelay on each connection before fib's
+// HTTP handler sees it, whichever way -nodelay points: fib turns the option on
+// for every TCP connection it accepts, and Go's net package, which applies it
+// for the other three, is not involved.
 type serverHandler struct {
 	*fibhttp.ServerHandler
 	nodelay bool
 }
 
 func (h *serverHandler) OnOpen(c *fib.Connection) {
+	nodelay := 0
 	if h.nodelay {
-		if err := syscall.SetsockoptInt(c.FD(), syscall.IPPROTO_TCP, syscall.TCP_NODELAY, 1); err != nil {
-			c.Close()
-			return
-		}
+		nodelay = 1
+	}
+	if err := syscall.SetsockoptInt(c.FD(), syscall.IPPROTO_TCP, syscall.TCP_NODELAY, nodelay); err != nil {
+		c.Close()
+		return
 	}
 	h.ServerHandler.OnOpen(c)
 }
